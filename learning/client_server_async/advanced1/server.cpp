@@ -32,182 +32,202 @@ using grpc::ServerContext;
 using grpc::ServerCompletionQueue;
 using grpc::Status;
 
-// Simple POD struct used as an argument wrapper for calls
+
 struct CallData {
-	mathlib::Math::AsyncService* service;
+    mathlib::Math::AsyncService* service;
     grpc::ServerCompletionQueue* cq;
-    // other stuff
 };
 
 // Base class used to cast the void* tags we get from
 // the completion queue and call Proceed() on them.
 class Call {
 public:
-    virtual void Proceed(bool ok) = 0;
+    virtual void Proceed() = 0;
 };
 
-class AddCall {
+
+class AddCall : public Call {
 public:
+    explicit AddCall(CallData* data) : data_(data), responder_(&ctx_), 
+		status_(CREATE)  {
+		cout << "AddCall constructor called" << endl;
+        on_done = [&](bool ok) { OnDone(ok); };
+		proceed = [&]() { Proceed(); };
+		// ctx_.AsyncNotifyWhenDone(&on_done);
+
+		Proceed();
+	}
+	void Proceed() {
+		switch (status_) {
+			case CREATE: {
+				status_ = PROCESS;
+
+				data_->service->RequestAdd(&ctx_,&request_,&responder_, data_->cq,
+						data_->cq, this);
+				cout <<"RequestAdd called"<<endl;
+			}
+			break;
+			case PROCESS: {
+				new AddCall(data_);
+
+				int a = request_.a();
+				int b = request_.b();
+				response_.set_result(a+b);
+
+				status_ = FINISH;
+				responder_.Finish(response_,Status::OK,this);
+				cout << "AddCall response sent" << endl;
+			}
+			break;
+			case FINISH: {
+				// finish_called_ = true;
+				// if (on_done_called_)
+
+				delete this;
+				cout <<"AddCall decallocated"<<endl;
+			}
+			break;
+			default:
+				break;
+		}
+	}
+	void OnDone(bool ok) {
+		assert(ok);
+		on_done_called_ = true;
+		if (finish_called_)
+			delete this;
+		else
+			status_ = FINISH;
+	}
+
+	std::function<void(void)> proceed;
+	std::function<void(bool)> on_done;
 
 private:
-}
+    CallData* data_;
+    grpc::ServerContext ctx_;
+	grpc::ServerAsyncResponseWriter<mathlib::MathReply> responder_;
+
+	mathlib::MathRequest request_;
+	mathlib::MathReply response_;
+
+	enum CallStatus { CREATE, PROCESS, FINISH };
+	CallStatus status_;
+	bool finish_called_ = false;
+	bool on_done_called_ = false;
+};
 
 class SubCall : public Call {
 public:
+    explicit SubCall(CallData* data) : data_(data), responder_(&ctx_), 
+		status_(CREATE)  {
+		cout << "SubCall constructor called" << endl;
+        on_done = [&](bool ok) { OnDone(ok); };
+		proceed = [&]() { Proceed(); };
+		// ctx_.AsyncNotifyWhenDone(&on_done);
+
+		Proceed();
+	}
+	void Proceed() {
+		switch (status_) {
+			case CREATE: {
+				status_ = PROCESS;
+				data_->service->RequestSub(&ctx_,&request_,&responder_, data_->cq,
+						data_->cq, this);
+				cout<<"RequestSub called"<<endl;
+			}
+			break;
+			case PROCESS: {
+				new SubCall(data_);
+
+				int a = request_.a();
+				int b = request_.b();
+				response_.set_result(a - b);
+
+				status_ = FINISH;
+				responder_.Finish(response_,Status::OK,this);
+				cout << "SubCall response sent" << endl;
+			}
+			break;
+			case FINISH: {
+				// finish_called_ = true;
+				// if (on_done_called_)
+				delete this;
+				cout<<"SubCall decallocated"<<endl;
+			}
+			break;
+			default:
+				break;
+		}
+	}
+	void OnDone(bool ok) {
+		assert(ok);
+		on_done_called_ = true;
+		if (finish_called_)
+			delete this;
+		else
+			status_ = FINISH;
+	}
+
+	std::function<void(void)> proceed;
+	std::function<void(bool)> on_done;
 
 private:
-}
+    CallData* data_;
+    grpc::ServerContext ctx_;
+	grpc::ServerAsyncResponseWriter<mathlib::MathReply> responder_;
+
+	mathlib::MathRequest request_;
+	mathlib::MathReply response_;
+
+	enum CallStatus { CREATE, PROCESS, FINISH };
+	CallStatus status_;
+	bool finish_called_ = false;
+	bool on_done_called_ = false;
+};
 
 
 class ServerImpl final {
- public:
-  ~ServerImpl() {
-    server_->Shutdown();
-    // Always shutdown the completion queue after the server.
-    cq_->Shutdown();
-  }
+public:
+	~ServerImpl() {
+		server_->Shutdown();
+		// Always shutdown the completion queue after the server.
+		cq_->Shutdown();
+	}
 
-  // There is no shutdown handling in this code.
-  void Run() {
-    std::string server_address("0.0.0.0:50051");
-
-    ServerBuilder builder;
-    // Listen on the given address without any authentication mechanism.
-    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-    // Register "service_" as the instance through which we'll communicate with
-    // clients. In this case it corresponds to an *asynchronous* service.
-    builder.RegisterService(&service_);
-    // Get hold of the completion queue used for the asynchronous communication
-    // with the gRPC runtime.
-    cq_ = builder.AddCompletionQueue();
-    // Finally assemble the server.
-    server_ = builder.BuildAndStart();
-    std::cout << "Server listening on " << server_address << std::endl;
-
-    // Proceed to the server's main loop.
-    HandleRpcs();
-  }
+	void Run() {
+		std::string server_address("0.0.0.0:50051");
+		ServerBuilder builder;
+		builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+		builder.RegisterService(&service_);
+		cq_ = builder.AddCompletionQueue();
+		server_ = builder.BuildAndStart();
+		std::cout << "Server listening on " << server_address << std::endl;
+		HandleRpcs();
+	}
 
  private:
-  // Class encompasing the state and logic needed to serve a request.
-  class CallData {
-   public:
-    // Take in the "service" instance (in this case representing an asynchronous
-    // server) and the completion queue "cq" used for asynchronous communication
-    // with the gRPC runtime.
-    CallData(Greeter::AsyncService* service, ServerCompletionQueue* cq)
-        : service_(service), cq_(cq), responder_(&ctx_), status_(CREATE) {
-      // Invoke the serving logic right away.
-      // std::cout <<"Constructor Called by TID = " << std::this_thread::get_id() << std::endl;
-      Proceed();
-    }
-
-    void Proceed() {
-      if (status_ == CREATE) {
-        // Make this instance progress to the PROCESS state.
-        status_ = PROCESS;
-
-        // As part of the initial CREATE state, we *request* that the system
-        // start processing SayHello requests. In this request, "this" acts are
-        // the tag uniquely identifying the request (so that different CallData
-        // instances can serve different requests concurrently), in this case
-        // the memory address of this CallData instance.
-		service_->RequestSayHello(&ctx_, &request_, &responder_, cq_, cq_,
-                                  this);
-        // std::cout <<"RequestSayHello called by TID = " << std::this_thread::get_id() << std::endl;
-      } else if (status_ == PROCESS) {
-        // Spawn a new CallData instance to serve new clients while we process
-        // the one for this CallData. The instance will deallocate itself as
-        // part of its FINISH state.
-        // std::cout << "new CallData Created! by TID = " << std::this_thread::get_id() <<std::endl;
-        new CallData(service_, cq_);
-
-        // The actual processing.
-        std::string prefix("Hello ");
-		{
-			int x = 0;
-			int y = 0;
-			while(x++ <= 100000000 ) { // takes around 1 sec to complete
-				y = y + 10;
-				y = y - 10;
-			}
+	void HandleRpcs() {
+		CallData data{&service_,cq_.get()};
+		new AddCall(&data);
+		new SubCall(&data);
+		void* tag;
+		bool ok;
+		while (true) {
+			GPR_ASSERT(cq_->Next(&tag, &ok));
+			GPR_ASSERT(ok);
+			static_cast<Call*>(tag)->Proceed();
 		}
-        reply_.set_message(prefix + request_.name());
+	}
 
-        // And we are done! Let the gRPC runtime know we've finished, using the
-        // memory address of this instance as the uniquely identifying tag for
-        // the event.
-        status_ = FINISH;
-        responder_.Finish(reply_, Status::OK, this);
-		    std::cout << "Replied by TID = " << std::this_thread::get_id() <<std::endl;
-      } else {
-        std::cout <<"deallocate done! by TID = "<< std::this_thread::get_id()  << std::endl;
-        GPR_ASSERT(status_ == FINISH);
-        // Once in the FINISH state, deallocate ourselves (CallData).
-        delete this;
-      }
-    }
-
-   private:
-    // The means of communication with the gRPC runtime for an asynchronous
-    // server.
-    Greeter::AsyncService* service_;
-    // The producer-consumer queue where for asynchronous server notifications.
-    ServerCompletionQueue* cq_;
-    // Context for the rpc, allowing to tweak aspects of it such as the use
-    // of compression, authentication, as well as to send metadata back to the
-    // client.
-    ServerContext ctx_;
-
-    // What we get from the client.
-    HelloRequest request_;
-    // What we send back to the client.
-    HelloReply reply_;
-
-    // The means to get back to the client.
-    ServerAsyncResponseWriter<HelloReply> responder_;
-
-    // Let's implement a tiny state machine with the following states.
-    enum CallStatus { CREATE, PROCESS, FINISH };
-    CallStatus status_;  // The current serving state.
-  };
-
-  // This can be run in multiple threads if needed.
-  void HandleRpcs() {
-    // Spawn a new CallData instance to serve new clients.
-    auto x = new CallData(&service_, cq_.get());
-	  Thpool pool;
-    void* tag;  // uniquely identifies a request.
-    bool ok;
-    int i = 0;
-    while (true) {
-      // Block waiting to read the next event from the completion queue. The
-      // event is uniquely identified by its tag, which in this case is the
-      // memory address of a CallData instance.
-      // The return value of Next should always be checked. This return value
-      // tells us whether there is any kind of event or cq_ is shutting down.
-      GPR_ASSERT(cq_->Next(&tag, &ok));
-	    GPR_ASSERT(ok);
-	    
-      std::function<void(void)> func = 
-        std::bind(&CallData::Proceed, static_cast<CallData*>(tag));
-	    
-      TaskProceed task(func);
-      pool.submit(task);
-      
-      std::cout <<"Proceed() done by TID = " << std::this_thread::get_id() <<  std::endl;
-      i++;
-    }
-  }
-
-  std::unique_ptr<ServerCompletionQueue> cq_;
-  Greeter::AsyncService service_;
-  std::unique_ptr<Server> server_;
+	mathlib::Math::AsyncService service_;
+	std::unique_ptr<ServerCompletionQueue> cq_;
+	std::unique_ptr<Server> server_;
 };
 
 int main(int argc, char** argv) {
-  ServerImpl server;
-  server.Run();
+	ServerImpl server;
+	server.Run();
 
-  return 0;
+	return 0;
 }

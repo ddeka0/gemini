@@ -11,10 +11,10 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
 all: client server
 
-client: helloworld.pb.o helloworld.grpc.pb.o client.o
+client: math.pb.o math.grpc.pb.o client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
-server: helloworld.pb.o helloworld.grpc.pb.o server.o
+server: math.pb.o math.grpc.pb.o server.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 %.grpc.pb.cc: %.proto
