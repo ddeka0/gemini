@@ -1,0 +1,33 @@
+# cmake build files
+/cmake/build
+
+# Visual Studio Code artifacts
+.vscode/*
+.history/
+
+
+# Clion artifacts
+cmake-build-debug/
+
+
+# vim temp files
+.*.swp
+
+
+
+*.o
+
+# git patch files
+*.patch
+
+#cmake junk
+cscope.*
+TAGS
+tags
+
+# dont ignore gitignore
+!.gitignore
+
+.gdb_history
+client
+server
