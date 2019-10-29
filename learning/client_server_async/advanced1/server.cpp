@@ -33,6 +33,8 @@ using grpc::ServerCompletionQueue;
 using grpc::Status;
 
 
+// main code starts from this position -------------------------
+
 struct CallData {
     mathlib::Math::AsyncService* service;
     grpc::ServerCompletionQueue* cq;
@@ -50,11 +52,6 @@ class AddCall : public Call {
 public:
     explicit AddCall(CallData* data) : data_(data), responder_(&ctx_), 
 		status_(CREATE)  {
-		cout << "AddCall constructor called" << endl;
-        on_done = [&](bool ok) { OnDone(ok); };
-		proceed = [&]() { Proceed(); };
-		// ctx_.AsyncNotifyWhenDone(&on_done);
-
 		Proceed();
 	}
 	void Proceed() {
@@ -64,7 +61,6 @@ public:
 
 				data_->service->RequestAdd(&ctx_,&request_,&responder_, data_->cq,
 						data_->cq, this);
-				cout <<"RequestAdd called"<<endl;
 			}
 			break;
 			case PROCESS: {
@@ -75,33 +71,22 @@ public:
 				response_.set_result(a+b);
 
 				status_ = FINISH;
+				
 				responder_.Finish(response_,Status::OK,this);
-				cout << "AddCall response sent" << endl;
+				
 			}
 			break;
 			case FINISH: {
-				// finish_called_ = true;
-				// if (on_done_called_)
-
+				
+				GPR_ASSERT(status_ == FINISH);
 				delete this;
-				cout <<"AddCall decallocated"<<endl;
+				
 			}
 			break;
 			default:
 				break;
 		}
 	}
-	void OnDone(bool ok) {
-		assert(ok);
-		on_done_called_ = true;
-		if (finish_called_)
-			delete this;
-		else
-			status_ = FINISH;
-	}
-
-	std::function<void(void)> proceed;
-	std::function<void(bool)> on_done;
 
 private:
     CallData* data_;
@@ -113,19 +98,12 @@ private:
 
 	enum CallStatus { CREATE, PROCESS, FINISH };
 	CallStatus status_;
-	bool finish_called_ = false;
-	bool on_done_called_ = false;
 };
 
 class SubCall : public Call {
 public:
     explicit SubCall(CallData* data) : data_(data), responder_(&ctx_), 
 		status_(CREATE)  {
-		cout << "SubCall constructor called" << endl;
-        on_done = [&](bool ok) { OnDone(ok); };
-		proceed = [&]() { Proceed(); };
-		// ctx_.AsyncNotifyWhenDone(&on_done);
-
 		Proceed();
 	}
 	void Proceed() {
@@ -134,7 +112,6 @@ public:
 				status_ = PROCESS;
 				data_->service->RequestSub(&ctx_,&request_,&responder_, data_->cq,
 						data_->cq, this);
-				cout<<"RequestSub called"<<endl;
 			}
 			break;
 			case PROCESS: {
@@ -146,31 +123,17 @@ public:
 
 				status_ = FINISH;
 				responder_.Finish(response_,Status::OK,this);
-				cout << "SubCall response sent" << endl;
 			}
 			break;
 			case FINISH: {
-				// finish_called_ = true;
-				// if (on_done_called_)
+				GPR_ASSERT(status_ == FINISH);
 				delete this;
-				cout<<"SubCall decallocated"<<endl;
 			}
 			break;
 			default:
 				break;
 		}
 	}
-	void OnDone(bool ok) {
-		assert(ok);
-		on_done_called_ = true;
-		if (finish_called_)
-			delete this;
-		else
-			status_ = FINISH;
-	}
-
-	std::function<void(void)> proceed;
-	std::function<void(bool)> on_done;
 
 private:
     CallData* data_;
@@ -182,8 +145,6 @@ private:
 
 	enum CallStatus { CREATE, PROCESS, FINISH };
 	CallStatus status_;
-	bool finish_called_ = false;
-	bool on_done_called_ = false;
 };
 
 
@@ -216,7 +177,11 @@ public:
 		while (true) {
 			GPR_ASSERT(cq_->Next(&tag, &ok));
 			GPR_ASSERT(ok);
-			static_cast<Call*>(tag)->Proceed();
+			if(tag == nullptr) {
+				cout <<"someting wrong !"<<endl;
+			}else {	
+				static_cast<Call*>(tag)->Proceed();
+			}
 		}
 	}
 

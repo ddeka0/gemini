@@ -78,30 +78,31 @@ private:
 };
 
 int main(int argc, char** argv) {
-	
-	MathClient mclient(grpc::CreateChannel(
-		"localhost:50051", grpc::InsecureChannelCredentials()));
-		
-	int x = -1,y = 1;
-	x = mclient.Add(1,2);  // The actual RPC call!
-	y = mclient.Sub(3,5);
-	std::cout << "Received:	 " << x <<" and "<< y << std::endl;
 
-	//   std::vector<std::thread> v;
-	//   for(int i = 0;i<200;i++) {
-	// 	  std::thread t([]() {
-	// 		    MathClient mclient(grpc::CreateChannel(
-	//       			"localhost:50051", grpc::InsecureChannelCredentials()));
+	// single client test
+	// MathClient mclient(grpc::CreateChannel(
+	// 	"localhost:50051", grpc::InsecureChannelCredentials()));
 		
-	// 		int x = mclient.Add(1,2);  // The actual RPC call!
-	// 		int y = mclient.Sub(3,5);
-	// 		std::cout << "Received:	 " << x <<" and "<< y << std::endl;
-	// 	  });
-	// 	  v.push_back(std::move(t));
-	//   }
-	//   for(auto & x:v) {
-	// 	  x.join();
-	//   }
+	// int x = -1,y = 1;
+	// x = mclient.Add(1,2);  // The actual RPC call!
+	// y = mclient.Sub(3,5);
+	// std::cout << "Received:	 " << x <<" and "<< y << std::endl;
+
+	// multi client test
+	int num_clients = 200;
+	std::vector<std::thread> v;
+	for(int i = 0;i<num_clients;i++) {
+		std::thread t([]() {
+			MathClient mclient(grpc::CreateChannel(
+			"localhost:50051", grpc::InsecureChannelCredentials()));
+
+			int x = mclient.Add(1,2);
+			int y = mclient.Sub(3,5);
+			std::cout << "Received:	 " << x <<" and "<< y << std::endl;
+		});
+		v.push_back(std::move(t));
+	}
 	
+	std::for_each(v.begin(), v.end(), [](std::thread & t){ t.join(); });
 	return 0;
 }
