@@ -27,3 +27,21 @@ tags
 
 # dont ignore gitignore
 !.gitignore
+
+
+# igore CMake artifects
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+build/
+bin/
+
+bin_auth/
+bin_node/
+bin_services/
+bin_database/
+bin_logsys/
+bin_serverutils/
+bin_sysmonitor/
