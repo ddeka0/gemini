@@ -1,14 +1,14 @@
 #pragma once
 #include "nodeBase.hpp"
-#include "Services/include/serviceBase.hpp"
+#include "Services/include/serviceManager.hpp"
 
-class LocalNode :public nodeBase {
+class LocalNode :public NodeBase {
 public:
     LocalNode(){};
     ~LocalNode(){};
-    void initialize();
-    // all the functions that we can perform on this node
+    // all the functions that we can perform on this nod
 protected:
 private:
-    std::vector<ServiceBase*> sv;
+	bool m_active;
+	ServiceManager m_srvcMgnr;
 };

@@ -7,8 +7,8 @@ public:
     ~TableBase(){};
     void updateTable(){};
     void clearTable();
-    nodeBase* getNodePtr();
+    NodeBase* getNodePtr();
 protected:
 private:
-    std::map<int,nodeBase*> Map;
+    std::map<int,NodeBase*> Map;
 };
