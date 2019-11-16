@@ -10,8 +10,8 @@ enum e_ServiceType {
 
 class ServiceManager {
 public:
-	ServiceManager(){};
-	~ServiceManager(){};
+	ServiceManager();
+	~ServiceManager();
 	void initialize();
 	void addService(e_ServiceType service);
 	void delService(e_ServiceType service);

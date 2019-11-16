@@ -2,8 +2,8 @@
 #include "serviceBase.hpp"
 class GetService : public ServiceBase {
 public:
-	GetService(){};
-	~GetService(){};
+	GetService();
+	~GetService();
 protected:
 private:
 };

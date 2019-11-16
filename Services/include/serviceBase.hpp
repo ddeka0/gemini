@@ -4,8 +4,8 @@
 
 class ServiceBase {
 public:
-    ServiceBase(){}
-    ~ServiceBase(){}
+    ServiceBase();
+    ~ServiceBase();
     void fixFingers();
     void stabilize();
     void checkPredecessor();
