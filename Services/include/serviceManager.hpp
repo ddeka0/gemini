@@ -16,6 +16,7 @@ public:
 	void addService(e_ServiceType service);
 	void delService(e_ServiceType service);
 	void updateService();
+	
 protected:
 private:
 	std::vector<ServiceBase*> serviceList;

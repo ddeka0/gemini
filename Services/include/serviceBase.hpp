@@ -1,7 +1,7 @@
 #pragma once
 #include "Chord/include/common.hpp"
 #include "Chord/include/tableBase.hpp"
-
+#define NBITS 10
 class ServiceBase {
 public:
     ServiceBase();
@@ -10,8 +10,8 @@ public:
     void stabilize();
     void checkPredecessor();
     void notify();
-    void findSuccessor();
-    void closestPrecedingNode();
+    NodeBase* findSuccessor();
+    NodeBase* closestPrecedingNode(unsigned int);
 protected:
 private:
     TableBase * m_table;

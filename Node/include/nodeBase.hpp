@@ -15,6 +15,7 @@ public:
 	void initilize();
 	Address * getAddress();
 	void setAddress();
+	unsigned int getId();
 protected:
 private:
 	Address m_addr;
