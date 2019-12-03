@@ -7,7 +7,7 @@ Address * NodeBase::getAddress() {
 	return &m_addr;
 }
 
-unsigned int NodeBase::getId() {
+unsigned int NodeBase::getId(unsigned int x) {
 	// TODO implement consistent hash of IP+PORT
 	// return an int value
 }

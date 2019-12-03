@@ -19,7 +19,7 @@ public:
     void stabilize();
     void checkPredecessor();
     void notify();
-    NodeBase* findSuccessor();
+    NodeBase* findSuccessor(unsigned int);
     NodeBase* closestPrecedingNode(unsigned int);
 protected:
 private:

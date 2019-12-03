@@ -15,7 +15,7 @@ public:
 	void initilize();
 	Address * getAddress();
 	void setAddress();
-	unsigned int getId();
+	unsigned int getId(unsigned int x = 0); // default offset value
 protected:
 private:
 	Address m_addr;
