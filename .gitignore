@@ -1,6 +1,6 @@
 # cmake build files
 /cmake/build
-
+geminiWorkSpace
 # Visual Studio Code artifacts
 .vscode/*
 .history/
