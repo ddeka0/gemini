@@ -12,6 +12,7 @@ set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIB_FILE ${CMAKE_CURRENT_SOURCE_DIR}/proto_lib/libmylib.a)
 
+include_directories(./proto_lib/)
 
 
 add_custom_target(libmylib.a ALL
@@ -20,7 +21,6 @@ add_custom_target(libmylib.a ALL
 					COMMENT "grpc headers and libraries are generating..."
 )
 
-include_directories(./proto_lib)
 
 # # extra safegurd for protobuf lib linking
 # include(FindProtobuf)
@@ -29,7 +29,7 @@ include_directories(./proto_lib)
 # # extra safegurd for protobuf lib linking
 
 
-add_executable(server server.cpp)
+# 
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -g")
@@ -61,7 +61,20 @@ if(grpc_location2)
   message(STATUS "grpc found at " ${grpc_location2})
 endif()
 
+add_executable(server server.cpp)
 target_link_libraries(server ${proto_location}
+							${LIB_FILE}
+							${grpc_location}
+							${grpc_reflection_location}
+							${dl_location}
+							${grpc_location2}
+							# ${PROTOBUF_LIBRARY}
+							${BASIC_LIBRARIES}
+)
+
+add_executable(client client.cc)
+
+target_link_libraries(client ${proto_location}
 							${LIB_FILE}
 							${grpc_location}
 							${grpc_reflection_location}
