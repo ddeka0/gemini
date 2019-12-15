@@ -1,22 +1,11 @@
-LDFLAGS = -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           -ldl -lgrpc -lpthread
-
-
 CXX = g++
-CPPFLAGS += `pkg-config --cflags protobuf grpc`
-CXXFLAGS += -std=c++17 -g
+CPPFLAGS += `pkg-config --cflags --libs protobuf grpc`
+CXXFLAGS += -std=c++11 -g 
 
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
 all: libmylib.a
-
-# client: math.pb.o math.grpc.pb.o client.o
-# 	$(CXX) $^ $(LDFLAGS) -o $@
-
-# server: math.pb.o math.grpc.pb.o server.o
-# 	$(CXX) $^ $(LDFLAGS) -o $@
 
 libmylib.a: math.pb.o math.grpc.pb.o
 	ar rcs libmylib.a $^
@@ -30,4 +19,4 @@ libmylib.a: math.pb.o math.grpc.pb.o
 libs: libmylib.a
 
 clean:
-	rm -f *.o *.a *.pb.cc *.pb.h client server
+	rm -f *.o *.a *.pb.cc *.pb.h
