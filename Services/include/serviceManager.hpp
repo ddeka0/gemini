@@ -19,5 +19,5 @@ public:
 	
 protected:
 private:
-	std::vector<ServiceBase*> serviceList;
+	std::vector<std::shared_ptr<ServiceBase>> m_serviceList;
 };

@@ -7,5 +7,5 @@ file(GLOB SERVICES_SRC src/*.cpp)
 
 add_library(libSERVICES STATIC ${SERVICES_SRC})
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -g")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -g")
 # set(CRYPTO_LIBRARIES  "-lssl -lcrypto")
