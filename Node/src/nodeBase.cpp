@@ -1,13 +1,14 @@
 #include "nodeBase.hpp"
-void NodeBase::initilize(){}
-NodeBase::NodeBase(const Address& addr) {
-	m_addr = addr;
-}
-Address * NodeBase::getAddress() {
-	return &m_addr;
-}
+
+NodeBase::NodeBase(){}
+NodeBase::~NodeBase(){}
 
 unsigned int NodeBase::getId(unsigned int x) {
 	// TODO implement consistent hash of IP+PORT
 	// return an int value
+}
+
+void NodeBase::Get() {
+	// Debug Print
+	std::cout << "Get() called with a NodeBase object" << std::endl;
 }

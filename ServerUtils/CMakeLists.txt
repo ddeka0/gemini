@@ -5,7 +5,7 @@ include_directories(../)
 
 file(GLOB SERVICES_SRC src/*.cpp)
 
-add_library(libSERVICES STATIC ${SERVICES_SRC})
+add_library(libSERVER STATIC ${SERVICES_SRC})
 
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -g")
 # set(CRYPTO_LIBRARIES  "-lssl -lcrypto")

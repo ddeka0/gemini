@@ -1,18 +1,40 @@
 #include "serviceManager.hpp"
-ServiceManager::ServiceManager(){};
-ServiceManager::~ServiceManager(){};
+ServiceManager::ServiceManager(){
+	// Debug print
+	std::cout << "ServiceManager instance created" << std::endl;
+};
+ServiceManager::~ServiceManager(){
+	// Debug print
+	std::cout << "Service Manager instance Destroyed" << std::endl;
+};
+/*
+This function reserves space for the serviceList inside serviceManager object
+*/
 void ServiceManager::initialize() {
 	m_serviceList.reserve(MAX_SERVICE);
 	for(auto & s_ptr:m_serviceList) {
 		s_ptr = nullptr;
 	}
+	std::cout << __FILE__<<" : "<<__func__<<"Size of m_serviceList = "<<m_serviceList.size()<<std::endl;
 }
-
+/*
+This function takes service names and allocated service objects to the list
+of services of servvicemanager, this servicemanager will be used by the 
+*/
 void ServiceManager::addService(e_ServiceType service) {
+	std::cout << __FILE__<<" : "<<__func__<< std::endl;
 	if(service == GET_SERVICE) {
 		std::shared_ptr<ServiceBase> _srvc = std::shared_ptr<ServiceBase>(new GetService());
+		std::cout << __FILE__<<" : "<<__func__<< std::endl;
+
 		m_serviceList[GET_SERVICE] = _srvc;
+		std::cout << __FILE__<<" : "<<__func__<< std::endl;
 	}else if(service == PUT_SERVICE) {
 		// TODO add put serice logic
 	}
+}
+
+void ServiceManager::executeHandler() {
+	// as of now it is executing GET() handler by default
+	m_serviceList[GET_SERVICE]->Get();
 }

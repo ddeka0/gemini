@@ -21,6 +21,9 @@ public:
     void notify();
     NodeBase* findSuccessor(unsigned int);
     NodeBase* closestPrecedingNode(unsigned int);
+
+    // test get function
+    virtual void Get();
 protected:
 private:
     // m_table holds the finger table pointer

@@ -1,7 +1,15 @@
+#include "Node/include/nodeBase.hpp"
 #include "grpcAsyncServer.hpp"
 #include "Chord/include/address.hpp"
 
-GrpcAsyncServer::GrpcAsyncServer(){};
+GrpcAsyncServer::GrpcAsyncServer() {
+	std::cout << "GrpcAsyncServer instance Created" << std::endl;
+}
+
+GrpcAsyncServer::GrpcAsyncServer(NodeBase* node) {
+	// Debug print
+	m_pNode = node;
+};
 GrpcAsyncServer::~GrpcAsyncServer() {
 	server_->Shutdown();
 	cq_->Shutdown();
@@ -9,7 +17,9 @@ GrpcAsyncServer::~GrpcAsyncServer() {
 
 // we need to call this Run() method from ecterna module
 void GrpcAsyncServer::Run() {
-	std::string server_address("0.0.0.0:50051");
+	std::string addr = m_pNode->getAddress()->toString();
+	std::cout << addr << std::endl;
+	std::string server_address(addr);
 	ServerBuilder builder;
 	builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 	builder.RegisterService(&service_);
@@ -21,8 +31,8 @@ void GrpcAsyncServer::Run() {
 
 void GrpcAsyncServer::HandleRpcs() {
 	CallData data{&service_,cq_.get()};
-	new AddCall(&data);
-	new SubCall(&data);
+	new AddCall(&data,this);
+	new SubCall(&data,this);
 	void* tag;
 	bool ok;
 	while (true) {
@@ -34,4 +44,8 @@ void GrpcAsyncServer::HandleRpcs() {
 			static_cast<Call*>(tag)->Proceed();
 		}
 	}
+}
+
+NodeBase * GrpcAsyncServer::getNode() {
+	return m_pNode;
 }

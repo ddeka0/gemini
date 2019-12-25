@@ -2,29 +2,15 @@
 #include "common.hpp"
 class Address {
 public:
-    Address() {
-        // default constructor
-    } 
-    ~Address() {
-        // default destructor
-    }
-    Address(std::string &ipAddr,std::string &port) 
-        : m_ipv4Addr(ipAddr),m_port(port) {
-        // add the checking of ipv4 addr or ipv6 addr
-    }
-    Address(std::string &port,std::string ipAddr = "localhost") 
-        : m_port(port){
-        
-    }
+    Address();
+    virtual ~Address();
+    Address(std::string &ipAddr,std::string &port);
+
+    Address(std::string &port,std::string ipAddr = "localhost");
     // had to overload this, because of rvalue reference
-    Address(std::string &&ipAddr,std::string &&port) 
-        : m_ipv4Addr(ipAddr),m_port(port) {
-        // add the checking of ipv4 addr or ipv6 addr
-    }
-    Address(std::string &&port,std::string ipAddr = "localhost") 
-        : m_port(port){
-        
-    }
+    Address(std::string &&ipAddr,std::string &&port);
+    Address(std::string &&port,std::string ipAddr = "localhost");
+    std::string toString();
 protected:
 private:
     std::string m_ipv4Addr;

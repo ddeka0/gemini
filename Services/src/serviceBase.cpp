@@ -70,3 +70,9 @@ NodeBase* ServiceBase::closestPrecedingNode(unsigned int Id) {
 	}
 	return m_node; // TODO a good macro for this like SELF, THIS_NODE etc.
 }
+
+
+void ServiceBase::Get() {
+	// Debug print
+	std::cout << "Get() called from ServiceBase" << std::endl;
+}

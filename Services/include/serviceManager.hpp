@@ -16,6 +16,8 @@ public:
 	void addService(e_ServiceType service);
 	void delService(e_ServiceType service);
 	void updateService();
+
+	void executeHandler();
 	
 protected:
 private:

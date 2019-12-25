@@ -45,3 +45,7 @@ bin_database/
 bin_logsys/
 bin_serverutils/
 bin_sysmonitor/
+bin_serverUtils/
+
+protocol/*.a
+protocol/*.o
