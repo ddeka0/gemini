@@ -27,6 +27,8 @@ public:
 			we can also do void setAddress(T&&)
 		check this options later
 	*/
+	virtual void addServices(uint8_t) = 0;
+
 
 	virtual void setAddress(std::shared_ptr<Address>) = 0;
 	virtual void Start() = 0;

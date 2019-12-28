@@ -30,10 +30,10 @@ This function takes argument as bitmask
 for example GET | PUT | DEL etc.
 and the implementation perform service adding or deletion for this node
 */
-void LocalNode::addServices() {
+void LocalNode::addServices(uint8_t flag) {
     // TODO add argument to the caller function
     std::cout <<"hh1" << std::endl;
-    m_srvcMgnr.addService(GET_SERVICE);
+    m_srvcMgnr.addService(flag);
 }
 
 void LocalNode::Start() {

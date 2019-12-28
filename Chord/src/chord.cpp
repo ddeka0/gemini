@@ -1,21 +1,26 @@
 #include "common.hpp"
 #include "chord.hpp"
+#include "cxxopts.hpp"
 
-int main() {
+int main(int argc, char* argv[]) {
+    auto result = parse(argc, argv);
     // Create a LocalNode instance
     std::shared_ptr<LocalNode> node = std::shared_ptr<LocalNode>(new LocalNode());
     
-    // Create a Server object
+    /* Create a server object and pass the node pointer to it
+    */
     std::shared_ptr<GrpcAsyncServer> server = std::shared_ptr<GrpcAsyncServer>(
         new GrpcAsyncServer(node.get())
     );
     // add services to the node
     std::cout <<"h1" << std::endl;
     
-    node->addServices();
+    node->addServices(GET_SERVICE_FLAG);
 
     // set the IP+PORT of the node, which will be used by the server object
-    std::shared_ptr<Address> addr = std::shared_ptr<Address>(new Address(std::string("5050")));
+    std::string local_port = result["local-port"].as<std::string>();
+    std::shared_ptr<Address> addr = std::shared_ptr<Address>(new Address(local_port));
+    
     node->setAddress(addr);
 
     // set the server

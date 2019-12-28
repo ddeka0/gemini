@@ -12,7 +12,7 @@ public:
     void setAddress(std::shared_ptr<Address>) override;
     std::shared_ptr<Address> getAddress() override;
 
-    void addServices();
+    void addServices(uint8_t) override;
     void Start();
 
     void Get() override;

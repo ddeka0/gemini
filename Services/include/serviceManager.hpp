@@ -14,6 +14,7 @@ public:
 	~ServiceManager();
 	void initialize();
 	void addService(e_ServiceType service);
+	void addService(uint8_t flag);
 	void delService(e_ServiceType service);
 	void updateService();
 
