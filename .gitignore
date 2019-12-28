@@ -47,5 +47,4 @@ bin_serverutils/
 bin_sysmonitor/
 bin_serverUtils/
 
-protocol/*.a
-protocol/*.o
+protocol/libmylib.a
