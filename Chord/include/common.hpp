@@ -62,3 +62,5 @@
 #define PUT_SERVICE_FLAG    1<<2    
 
 #define PRINT_FUNC_NAME     std::cout << __FILE__ <<":"<<__LINE__ <<" "<< __func__ << std::endl
+
+bool inrange(unsigned int a,unsigned int b,unsigned int c);

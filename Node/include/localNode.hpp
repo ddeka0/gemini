@@ -16,6 +16,26 @@ public:
     void Start();
 
     void Get() override;
+    unsigned int getId(unsigned int x = 0) override;
+
+    NodeBase* getPredecessor() override;
+    NodeBase* getSuccessor() override;
+
+	void setSuccessor(NodeBase*) override;
+	void setPredecessor(NodeBase*) override;
+
+    NodeBase* findSuccessor(unsigned int) override;
+
+	void fixFingers() override;
+    
+	void stabilize() override;
+
+	void checkPredecessor() override;
+
+	void notify(NodeBase*) override;
+
+    NodeBase* closestPrecedingNode(unsigned int) override;
+
 	// methods to handle the client requests
     // all the functions that we can perform on this nod
 protected:

@@ -34,8 +34,33 @@ public:
 	virtual void Start() = 0;
 	virtual unsigned int getId(unsigned int x = 0); // default offset value
 
+	virtual NodeBase* getPredecessor() = 0; // this could lead to a RPC call
+											// or local function call
+	virtual NodeBase* getSuccessor() = 0; // this could lead to a RPC call
+											// or local function call
+
+	virtual void setSuccessor(NodeBase*) = 0;
+	virtual void setPredecessor(NodeBase*) = 0;
+
+	virtual NodeBase* findSuccessor(unsigned int) = 0;
+
+	virtual void fixFingers() = 0;
+    
+	virtual void stabilize() = 0;
+
+	virtual void checkPredecessor() = 0;
+
+	virtual void notify(NodeBase*) = 0;
+
+    virtual NodeBase* closestPrecedingNode(unsigned int) = 0;
+	
 	virtual void Get();
 	// member varibles
+	std::shared_ptr<TableBase> m_table; // this table is common to all the 
+										// services for a node
+										// therefore we want a single instance
+										// of it 
+	NodeBase * m_predecessor = nullptr;
 protected:
 	std::shared_ptr<Address> m_addr;
 private:

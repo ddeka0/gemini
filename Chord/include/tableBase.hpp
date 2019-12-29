@@ -8,9 +8,10 @@ public:
     void updateTable();
     void clearTable();
     NodeBase* getNodePtr();
-    NodeBase*& operator[](int);
+    virtual NodeBase*& operator[](int);
     // This Map will be holder of NodeBase ptrs for indices from 0 to 2^n - 1
     std::map<int,NodeBase*> Map;
+
 protected:
 private:
 };

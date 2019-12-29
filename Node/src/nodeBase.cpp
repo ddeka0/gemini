@@ -6,6 +6,7 @@ NodeBase::~NodeBase(){}
 unsigned int NodeBase::getId(unsigned int x) {
 	// TODO implement consistent hash of IP+PORT
 	// return an int value
+	return 123;
 }
 
 void NodeBase::Get() {

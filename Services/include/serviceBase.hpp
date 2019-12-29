@@ -8,25 +8,27 @@ class also
 */
 #pragma once
 #include "Chord/include/common.hpp"
-#include "Chord/include/tableBase.hpp"
+#include "Chord/include/fingerTable.hpp"
 #define NBITS 10
 class ServiceBase {
 public:
     ServiceBase();
     ~ServiceBase();
     void initialize(NodeBase*); // CHECK what type pointer to pass
-    void fixFingers();
-    void stabilize();
-    void checkPredecessor();
-    void notify();
-    NodeBase* findSuccessor(unsigned int);
-    NodeBase* closestPrecedingNode(unsigned int);
+    // void fixFingers();
+    // void stabilize();
+    // void checkPredecessor();
+    // void notify();
+    // NodeBase* findSuccessor(unsigned int);
+    // NodeBase* closestPrecedingNode(unsigned int);
 
     // test get function
     virtual void Get();
+
+
 protected:
 private:
     // m_table holds the finger table pointer
-    TableBase * m_table;
-    NodeBase * m_node;
+    TableBase* m_table; // ServiceBase class does not owns this table
+    NodeBase * m_node = nullptr; // Service Base class dont own this pointer
 };
