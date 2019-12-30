@@ -1,10 +1,17 @@
 #include "localNode.hpp"
+#include "Chord/include/utils.hpp" // for hashing
 
-LocalNode::LocalNode(){
+/* Constructor of LocalNode class
+*/
+LocalNode::LocalNode() {
+	PRINT_FUNC_NAME;
     // debug print
     std::cout << "LocalNode instance created" << std::endl;
     m_srvcMgnr.initialize();
 };
+
+/* Destructor of LocalNode class
+*/
 LocalNode::~LocalNode(){
     // Debug print
     std::cout << "LocalNode instance destroyed" << std::endl;
@@ -14,6 +21,9 @@ void LocalNode::initialize(std::shared_ptr<GrpcAsyncServer> _server) {
     std::cout << "LocalNode Initialized"<< std::endl;
     m_server = _server;
     m_table = std::shared_ptr<TableBase>(new FingerTable());
+	
+	// temp fix
+	(*m_table)[0] = this;
 }
 
 /*
@@ -34,7 +44,6 @@ and the implementation perform service adding or deletion for this node
 void LocalNode::addServices(uint8_t flag) {
     PRINT_FUNC_NAME;
     // TODO add argument to the caller function
-    std::cout <<"hh1" << std::endl;
     m_srvcMgnr.addService(flag);
 }
 
@@ -68,34 +77,31 @@ void LocalNode::setPredecessor(NodeBase * node) {
 }
 
 unsigned int LocalNode::getId(unsigned int x) {
-    // TODO implement consistent hash with x
-    return 123;
+	std::cout<<__func__<<std::endl;
+	unsigned int res = sha256(m_addr->toString());
+	std::cout <<"res = "<<res<<std::endl;
+	return res;
 }
 
 NodeBase* LocalNode::findSuccessor(unsigned int Id) {
-	if(inrange(Id,this->getId(),this->getId()/* this is wrong*/) and
-		(this->getId() != this->getId()) and 
+	if(inrange(Id,this->getId(),this->getSuccessor()->getId()) and
+		(this->getId() != this->getSuccessor()->getId()) and 
 		(Id != this->getId())) {
 
-		return this->getSuccessor(); // this is wrong , we need to return m_node->successor();	
+		return this->getSuccessor();	
 	}else {
-		NodeBase* remote = closestPrecedingNode(Id); // TODO smart ptr
+		auto remote = closestPrecedingNode(Id);
 		if(this->getId() != remote->getId()) {
-			// remote.getWhatServiceIsThis().findSuccessor(Id);
-			// therefore a node class must have a pointer to a specific service
-			// it will be having pointers to ServiceBase class.
-			// becuase we are inside ServiceBase class method, there must be 
-			// some mechanism to get the hold of remote's service objects
-
+			return remote->findSuccessor(Id);
 		}else{
-			return this; // TODO good macro for this like SELF, THIS_NODE etc.
+			return this;
 		}
 
 	}
 }
 
 void LocalNode::fixFingers() {
-	// TODO need to chamnge stopping mechanism of this while loop
+	PRINT_FUNC_NAME;
 	bool running = true;
 	int nxt = 0;
 	while(running) {
@@ -115,16 +121,17 @@ void LocalNode::fixFingers() {
 }
 
 NodeBase* LocalNode::closestPrecedingNode(unsigned int Id) {
+	PRINT_FUNC_NAME;
 	for(int idx = NBITS - 1;idx >=0 ;idx--) {
-		if(m_table->Map[idx]->getId() != -1 and
-			inrange(m_table->Map[idx]->getId(),this->getId(),Id) and
-			(m_table->Map[idx]->getId() != this->getId()) and 
-			Id != m_table->Map[idx]->getId()) 
+		if(((*m_table)[idx])->getId() != -1 and
+			inrange(((*m_table)[idx])->getId(),this->getId(),Id) and
+			(((*m_table)[idx])->getId() != this->getId()) and 
+			Id != ((*m_table)[idx])->getId()) 
 		{
-			return m_table->Map[idx];
+			return ((*m_table)[idx]);
 		} 
 	}
-	return this; // TODO a good macro for this like SELF, THIS_NODE etc.
+	return this;
 }
 
 /* This function will run in a separate thread and run for ever
@@ -137,7 +144,7 @@ void LocalNode::stabilize() {
 			std::cout << "Not null predecessor" << std::endl;
 		}
 		if(nullptr != this->getSuccessor()) {
-			std::cout << "Not null predecessor" << std::endl;
+			std::cout << "Not null successor" << std::endl;
 		}
 		// my successor is pointing to myself, that means I were the first node
 		// and then my predecesor is not null , i.e. pointing to some other node(x)
@@ -145,9 +152,13 @@ void LocalNode::stabilize() {
 		// simultaneus node addition with the same remote and concurrency 
 		// will be handled later
 		auto suc = this->getSuccessor(); // suc is of type NodeBase *
+		if(suc == nullptr) {
+			std::cout << "successor is not set" << std::endl;
+		}
 		if(nullptr != suc and nullptr != this->getPredecessor()) {
 			(*m_table)[0] = this->getPredecessor();
 		}else {
+
 			auto pred = suc->getPredecessor();
 
 			if(nullptr != pred and inrange(pred->getId(),this->getId(),suc->getId()) and 
@@ -176,4 +187,8 @@ void LocalNode::notify(NodeBase * remote) {
         this->m_predecessor = remote;
     }
     // some TODO task for key transfer from this node the new predecessor
+}
+
+void LocalNode::checkPredecessor() {
+	PRINT_FUNC_NAME;
 }

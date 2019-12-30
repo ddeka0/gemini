@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
 
 # add_definitions(-DBOOST_LOG_DYN_LINK)
 
-set(BASIC_LIBRARIES "-lpthread")
+set(BASIC_LIBRARIES "-lpthread -lcrypto")
 # set(REST_LIBRARIES "-lcpprest -lyaml-cpp")
 # set(CMAKE_CXX_FLAGS "-std=c++0x -Wall -g  -fsanitize=address")
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -g")

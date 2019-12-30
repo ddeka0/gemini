@@ -12,8 +12,6 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<GrpcAsyncServer> server = std::shared_ptr<GrpcAsyncServer>(
         new GrpcAsyncServer(node.get())
     );
-    // add services to the node
-    std::cout <<"h1" << std::endl;
     
     node->addServices(GET_SERVICE_FLAG);
 
@@ -25,7 +23,11 @@ int main(int argc, char* argv[]) {
 
     // set the server
     node->initialize(server);
-    std::cout <<"h2" << std::endl;
+
+    std::thread t1(&LocalNode::stabilize,node);
+
 
     node->Start();
+    t1.join();
+    
 }

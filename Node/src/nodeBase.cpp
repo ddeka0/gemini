@@ -1,12 +1,18 @@
 #include "nodeBase.hpp"
+#include "Chord/include/utils.hpp" // for hashing
 
-NodeBase::NodeBase(){}
-NodeBase::~NodeBase(){}
+NodeBase::NodeBase(){
+	PRINT_FUNC_NAME;
+}
+NodeBase::~NodeBase(){
+	PRINT_FUNC_NAME;
+}
 
 unsigned int NodeBase::getId(unsigned int x) {
-	// TODO implement consistent hash of IP+PORT
-	// return an int value
-	return 123;
+	PRINT_FUNC_NAME;
+	unsigned int res = sha256(m_addr->toString());
+	std::cout <<"res = "<<res<<std::endl;
+	return res;
 }
 
 void NodeBase::Get() {

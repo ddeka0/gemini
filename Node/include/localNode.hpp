@@ -2,10 +2,11 @@
 #include "nodeBase.hpp"
 #include "Services/include/serviceManager.hpp"
 #include "ServerUtils/include/grpcAsyncServer.hpp"
+#include "Chord/include/fingerTable.hpp"
 
 class LocalNode :public NodeBase {
 public:
-    LocalNode();
+    explicit LocalNode();
     virtual ~LocalNode();
     
     void initialize(std::shared_ptr<GrpcAsyncServer>) override;
@@ -35,6 +36,8 @@ public:
 	void notify(NodeBase*) override;
 
     NodeBase* closestPrecedingNode(unsigned int) override;
+
+    // void join() override;
 
 	// methods to handle the client requests
     // all the functions that we can perform on this nod

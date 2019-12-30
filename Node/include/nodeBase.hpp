@@ -1,14 +1,10 @@
 #pragma once
 #include "Chord/include/common.hpp"
 #include "Chord/include/address.hpp"
-// #include "ServerUtils/include/grpcAsyncServer.hpp"
-/*
-This is a parent node class.
-It should have:
-1. Address
-2. 
-*/
+// #include "Chord/include/tableBase.hpp"
+
 class GrpcAsyncServer;
+class TableBase;
 
 class NodeBase {
 public:
@@ -53,6 +49,8 @@ public:
 	virtual void notify(NodeBase*) = 0;
 
     virtual NodeBase* closestPrecedingNode(unsigned int) = 0;
+
+	// virtual void join() = 0;
 	
 	virtual void Get();
 	// member varibles

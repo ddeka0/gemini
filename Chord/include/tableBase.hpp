@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "Node/include/nodeBase.hpp"
+
 class TableBase {
 public:
     TableBase();
