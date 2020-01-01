@@ -16,3 +16,15 @@ unsigned int sha256(const std::string str) {
     }
     return res % MOD;
 }
+
+bool inrange(unsigned int c,unsigned int a,unsigned int b) {
+	// TODO implement inrange in proper directory and file
+	a = a % SIZE;
+	b = b % SIZE;
+	c = c % SIZE;
+	if(a < b) {
+		return (a <= c) and (c < b);
+	}else {
+		return (a <= c) or (c < b);
+	}
+}

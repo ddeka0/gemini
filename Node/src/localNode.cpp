@@ -8,8 +8,29 @@ LocalNode::LocalNode() {
     // debug print
     std::cout << "LocalNode instance created" << std::endl;
     m_srvcMgnr.initialize();
+	m_table = std::shared_ptr<TableBase>(new FingerTable());
+
 };
 
+/* This function joins this node to the to exisiting ring with the 
+* help of a remote node
+*/
+// def join(self, RemoteAddress=None):
+// 	if RemoteAddress:
+// 		remoteInstance = RemoteNode(RemoteAddress)
+// 		self._finger[0] = remoteInstance.findSuccessor(self.getIdentifier())
+// 	else:
+// 		self._finger[0] = self  # fot the node-0
+void LocalNode::join(Address * remote_addr) {
+	if("none:none" != remote_addr->toString()) {
+		// remoteInstance = RemoteNode(RemoteAddress)
+		// self._finger[0] = remoteInstance.findSuccessor(self.getIdentifier())
+	}else {
+		// set the successor to myself, or this node
+		// (*m_table)[0] = this;
+		m_table->setEntry(0,this);
+	}
+}
 /* Destructor of LocalNode class
 */
 LocalNode::~LocalNode(){
@@ -20,10 +41,8 @@ LocalNode::~LocalNode(){
 void LocalNode::initialize(std::shared_ptr<GrpcAsyncServer> _server) {
     std::cout << "LocalNode Initialized"<< std::endl;
     m_server = _server;
-    m_table = std::shared_ptr<TableBase>(new FingerTable());
+    // m_table = std::shared_ptr<TableBase>(new FingerTable());
 	
-	// temp fix
-	(*m_table)[0] = this;
 }
 
 /*
@@ -64,12 +83,13 @@ NodeBase* LocalNode::getPredecessor() {
 
 NodeBase* LocalNode::getSuccessor() {
     PRINT_FUNC_NAME;
-    return (*m_table)[0];
+    // return (*m_table)[0];
+	return m_table->getEntry(0);
 }
 
 void LocalNode::setSuccessor(NodeBase * node) {
     PRINT_FUNC_NAME;
-    (*m_table)[0] = node;
+	m_table->setEntry(0,node);
 }
 void LocalNode::setPredecessor(NodeBase * node) {
     PRINT_FUNC_NAME;
@@ -77,9 +97,9 @@ void LocalNode::setPredecessor(NodeBase * node) {
 }
 
 unsigned int LocalNode::getId(unsigned int x) {
-	std::cout<<__func__<<std::endl;
-	unsigned int res = sha256(m_addr->toString());
-	std::cout <<"res = "<<res<<std::endl;
+	// std::cout<<__func__<<std::endl;
+	unsigned int res = sha256(m_addr->toString()) + x;
+	// std::cout <<"res = "<<res<<std::endl;
 	return res;
 }
 
@@ -110,25 +130,24 @@ void LocalNode::fixFingers() {
 		if(nxt > NBITS) {
 			nxt = 1;
 		}
-		// TODO write operator overload for [] op
-		// overload the [] operator to mask the Map object
-		// m_table->Map[nxt - 1] = findSuccessor();
-		((*m_table)[nxt - 1]) = this->findSuccessor(this->getId(1<<(nxt - 1)));
-		// m_table[nxt - 1] = 
-		// TODO make inclide.hpp header file for all such such function
+
+		m_table->setEntry(nxt - 1,this->findSuccessor(this->getId(1<<(nxt - 1))));
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		m_table->printTable();
+		//this->printTable();
 	}
 }
 
 NodeBase* LocalNode::closestPrecedingNode(unsigned int Id) {
 	PRINT_FUNC_NAME;
 	for(int idx = NBITS - 1;idx >=0 ;idx--) {
-		if(((*m_table)[idx])->getId() != -1 and
-			inrange(((*m_table)[idx])->getId(),this->getId(),Id) and
-			(((*m_table)[idx])->getId() != this->getId()) and 
-			Id != ((*m_table)[idx])->getId()) 
+		if( m_table->getEntry(idx) != nullptr and
+			inrange(m_table->getEntry(idx)->getId(),this->getId(),Id) and
+			(m_table->getEntry(idx)->getId() != this->getId()) and 
+			Id != m_table->getEntry(idx)->getId()) 
 		{
-			return ((*m_table)[idx]);
+			return m_table->getEntry(idx);
 		} 
 	}
 	return this;
@@ -140,12 +159,14 @@ void LocalNode::stabilize() {
 	// infinite loop
 	PRINT_FUNC_NAME;
 	while(true) {
+		std::string lg("");
 		if(nullptr != this->getPredecessor()) {
-			std::cout << "Not null predecessor" << std::endl;
+			lg += "Predecessor = " + getPredecessor()->getAddress()->toString(); 
 		}
 		if(nullptr != this->getSuccessor()) {
-			std::cout << "Not null successor" << std::endl;
+			lg += " | Successor = " + getSuccessor()->getAddress()->toString();
 		}
+		std::cout <<getId()<<" "<<lg << std::endl;
 		// my successor is pointing to myself, that means I were the first node
 		// and then my predecesor is not null , i.e. pointing to some other node(x)
 		// what does this mean ? it means my successor should also point to x
@@ -156,7 +177,8 @@ void LocalNode::stabilize() {
 			std::cout << "successor is not set" << std::endl;
 		}
 		if(nullptr != suc and nullptr != this->getPredecessor()) {
-			(*m_table)[0] = this->getPredecessor();
+			// (*m_table)[0] = this->getPredecessor();
+			m_table->setEntry(0,this->getPredecessor());
 		}else {
 
 			auto pred = suc->getPredecessor();
@@ -184,6 +206,7 @@ void LocalNode::notify(NodeBase * remote) {
     (remote->getId() != this->getSuccessor()->getId()) and
     (remote->getId() != this->getId()) ) )
     {
+
         this->m_predecessor = remote;
     }
     // some TODO task for key transfer from this node the new predecessor
@@ -191,4 +214,8 @@ void LocalNode::notify(NodeBase * remote) {
 
 void LocalNode::checkPredecessor() {
 	PRINT_FUNC_NAME;
+}
+
+void LocalNode::printTable() {
+	m_table->printTable();
 }

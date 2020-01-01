@@ -24,14 +24,6 @@ void ServiceBase::initialize(NodeBase* node) {
 
 }
 
-bool inrange(unsigned int a,unsigned int b,unsigned int c) {
-	// TODO implement inrange in proper directory and file
-	return false;
-}
-
-
-
-
 void ServiceBase::Get() {
 	// Debug print
 	std::cout << "Get() called from ServiceBase" << std::endl;

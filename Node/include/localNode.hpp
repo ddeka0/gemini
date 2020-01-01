@@ -37,6 +37,9 @@ public:
 
     NodeBase* closestPrecedingNode(unsigned int) override;
 
+    void join(Address * remote_addr) override;
+
+    void printTable() override;
     // void join() override;
 
 	// methods to handle the client requests

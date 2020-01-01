@@ -6,10 +6,10 @@ public:
     virtual ~Address();
     Address(std::string &ipAddr,std::string &port);
 
-    Address(std::string &port,std::string ipAddr = "localhost");
+    // Address(std::string &port,std::string ipAddr = "localhost");
     // had to overload this, because of rvalue reference
     Address(std::string &&ipAddr,std::string &&port);
-    Address(std::string &&port,std::string ipAddr = "localhost");
+    // Address(std::string &&port,std::string ipAddr = "localhost");
     std::string toString();
 protected:
 private:

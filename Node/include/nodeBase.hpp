@@ -50,6 +50,10 @@ public:
 
     virtual NodeBase* closestPrecedingNode(unsigned int) = 0;
 
+	virtual void join(Address * remote_addr) = 0;
+
+	virtual void printTable() = 0;
+
 	// virtual void join() = 0;
 	
 	virtual void Get();

@@ -5,6 +5,7 @@ class FingerTable : public TableBase {
 public:
     FingerTable();
     ~FingerTable();
+    void printTable() override;
 protected:
 private:
 };

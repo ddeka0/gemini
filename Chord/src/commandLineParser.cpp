@@ -39,10 +39,10 @@ parse(int argc, char* argv[]) {
 	options
 	  .allow_unrecognised_options()
 	  .add_options()
-	  ("local-ip", "self ip address", cxxopts::value<std::string>())
+	  ("local-ip", "self ip address", cxxopts::value<std::string>()->default_value("localhost"))
 	  ("local-port", "self port", cxxopts::value<std::string>())
-	  ("remote-ip", "remote ip address", cxxopts::value<std::string>())
-	  ("remote-port", "remote port", cxxopts::value<std::string>())
+	  ("remote-ip", "remote ip address", cxxopts::value<std::string>()->default_value("none"))
+	  ("remote-port", "remote port", cxxopts::value<std::string>()->default_value("none"))
 	  // ("rip,remote-ip-address", "ip address of the remote to connect",cxxopts::value<std::string>())
 	  // ("rp,remote-port", "ip address of the remote to connect",cxxopts::value<std::string>())
 	//   do not remove these comments // they are usefull for using this header library for

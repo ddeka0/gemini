@@ -9,7 +9,6 @@ class also
 #pragma once
 #include "Chord/include/common.hpp"
 #include "Chord/include/fingerTable.hpp"
-#define NBITS 10
 class ServiceBase {
 public:
     ServiceBase();
