@@ -9,7 +9,7 @@ GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
 all: libmylib.a
 
-libmylib.a: test.pb.o test.grpc.pb.o
+libmylib.a: messages.pb.o messages.grpc.pb.o
 	ar rcs libmylib.a $^
 
 %.grpc.pb.cc: %.proto

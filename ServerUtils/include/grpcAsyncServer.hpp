@@ -1,7 +1,7 @@
 #pragma once
 #include "Node/include/nodeBase.hpp"
 #include "Chord/include/common.hpp"
-#include "protocol/test.grpc.pb.h" // this file will be generated 
+#include "protocol/messages.grpc.pb.h" // this file will be generated 
 // only when you execute the makefile inside protocol folder
 
 
@@ -30,7 +30,7 @@ private:
 	// because we dont have compiled code for proto files yet
 	// for example we dont have mathlib ready
 
-	mathlib::Math::AsyncService service_;
+	chordMsg::ChordService::AsyncService service_;
 	std::unique_ptr<ServerCompletionQueue> cq_;
 	std::unique_ptr<Server> server_;
 	NodeBase* m_pNode;
@@ -38,16 +38,20 @@ private:
 
 
 struct CallData {
-    mathlib::Math::AsyncService* service;
+	chordMsg::ChordService::AsyncService service;
     grpc::ServerCompletionQueue* cq;
 };
 
 // Base class used to cast the void* tags we get from
 // the completion queue and call Proceed() on them.
+
+
+
 class Call {
 public:
     virtual void Proceed() = 0;
 };
+
 
 class AddCall : public Call {
 public:
