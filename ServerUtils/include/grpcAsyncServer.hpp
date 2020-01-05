@@ -13,6 +13,7 @@ using grpc::ServerCompletionQueue;
 using grpc::Status;
 
 
+
 #include <grpcpp/grpcpp.h>
 #include <grpc/support/log.h>
 
@@ -26,6 +27,9 @@ public:
 protected:
 private:
 	void HandleRpcs();
+	// This function will Prepare and Create new instances of RpcStateMgmt for 
+	// handling each RPC method for the clients
+	void InitiateRpcRequest();
 	// This section of code might not compile
 	// because we dont have compiled code for proto files yet
 	// for example we dont have mathlib ready
@@ -34,48 +38,58 @@ private:
 	std::unique_ptr<ServerCompletionQueue> cq_;
 	std::unique_ptr<Server> server_;
 	NodeBase* m_pNode;
+	
 };
 
-
-struct CallData {
-	chordMsg::ChordService::AsyncService service;
-    grpc::ServerCompletionQueue* cq;
-};
 
 // Base class used to cast the void* tags we get from
 // the completion queue and call Proceed() on them.
 
 
 
-class Call {
+class RpcStateMgmtIntf {
 public:
     virtual void Proceed() = 0;
 };
 
-
-class AddCall : public Call {
+template<class Service, class Request, class Reply,  typename InitAsyncReqFunc, 
+typename InvokerRpcFunc>
+class RpcStateMgmt : public RpcStateMgmtIntf {
 public:
-    explicit AddCall(CallData* data,GrpcAsyncServer * _server) : data_(data), responder_(&ctx_), 
-		status_(CREATE),m_server(_server)  {
+    explicit RpcStateMgmt(Service* service, ServerCompletionQueue* cq,
+			GrpcAsyncServer * _server, InitAsyncReqFunc& initAsyncReqfunc, 
+			InvokerRpcFunc & invokerRpcfunc)
+		: service_(service),
+		cq_(cq), 
+		responder_(&ctx_), 
+		status_(CREATE),
+		m_server(_server),  
+		initAsyncReqfunc_(initAsyncReqfunc),
+		invokerRpcfunc_(invokerRpcfunc) {
 		Proceed();
 	}
 	void Proceed() {
 		switch (status_) {
 			case CREATE: {
 				status_ = PROCESS;
-
-				data_->service->RequestAdd(&ctx_,&request_,&responder_, data_->cq,
-						data_->cq, this);
-				// Test
+				initAsyncReqfunc_(&ctx_,&request_,&responder_,cq_,cq_,this);
+				// folling line is a test code
 				m_server->getNode()->Get();
 			}
 			break;
 			case PROCESS: {
-				new AddCall(data_,m_server);
 
-				int a = request_.a();
-				int b = request_.b();
-				response_.set_result(a+b);
+				new RpcStateMgmt<Service,Request,Reply,InitAsyncReqFunc,
+				InvokerRpcFunc>
+				(service_, cq_, m_server,initAsyncReqfunc_, invokerRpcfunc_);
+
+
+				// TODO call the invokerRpcfunc_
+				// int a = request_.a();
+				// int b = request_.b();
+				// response_.set_result(a+b);
+				invokerRpcfunc_(0); // 0 is wrong as of now
+
 
 				status_ = FINISH;
 				
@@ -95,68 +109,20 @@ public:
 		}
 	}
 private:
-    CallData* data_;
+	Service* service_;
+	grpc::ServerCompletionQueue* cq_;
     grpc::ServerContext ctx_;
-	grpc::ServerAsyncResponseWriter<mathlib::MathReply> responder_;
+	grpc::ServerAsyncResponseWriter<Reply> responder_;
 
-	mathlib::MathRequest request_;
-	mathlib::MathReply response_;
+	Request request_;
+	Reply response_;
+
+	InitAsyncReqFunc initAsyncReqfunc_; // for example RequestSub ptr
+	InvokerRpcFunc invokerRpcfunc_; // GET or PUT service fuction ptr
 
 	enum CallStatus { CREATE, PROCESS, FINISH };
 	CallStatus status_;
 	GrpcAsyncServer * m_server;
 };
 
-class SubCall : public Call {
-public:
-    explicit SubCall(CallData* data,GrpcAsyncServer *_server) : data_(data), responder_(&ctx_), 
-		status_(CREATE),m_server(_server)  {
-		Proceed();
-	}
-	void Proceed() {
-		switch (status_) {
-			case CREATE: {
-				status_ = PROCESS;
-				data_->service->RequestSub(&ctx_,&request_,&responder_, data_->cq,
-						data_->cq, this);
-				
-				// Test
-				m_server->getNode()->Get();
-			}
-			break;
-			case PROCESS: {
-				new SubCall(data_,m_server);
-
-				// call the methods from Services
-				// m_server->getNode()->Get();
-				
-				int a = request_.a();
-				int b = request_.b();
-				response_.set_result(a - b);
-
-				status_ = FINISH;
-				responder_.Finish(response_,Status::OK,this);
-			}
-			break;
-			case FINISH: {
-				GPR_ASSERT(status_ == FINISH);
-				delete this;
-			}
-			break;
-			default:
-				break;
-		}
-	}
-private:
-    CallData* data_;
-    grpc::ServerContext ctx_;
-	grpc::ServerAsyncResponseWriter<mathlib::MathReply> responder_;
-
-	mathlib::MathRequest request_;
-	mathlib::MathReply response_;
-
-	enum CallStatus { CREATE, PROCESS, FINISH };
-	CallStatus status_;
-	GrpcAsyncServer * m_server;
-};
 

@@ -29,10 +29,35 @@ void GrpcAsyncServer::Run() {
 	HandleRpcs();
 }
 
+void GrpcAsyncServer::InitiateRpcRequest() {
+	// Prepare FindSuccessor RPC
+	auto initAsyncReq_FindSuccessor = [this](ServerContext * ctx, 
+		chordMsg::Id* request, 
+		grpc::ServerAsyncResponseWriter<chordMsg::NodeAddr>* responder,
+		grpc::CompletionQueue* call_cq,
+		grpc::ServerCompletionQueue* notfiy_cq,void * tag) {
+			this->service_.RequestFindSuccessor(ctx,request,responder,call_cq,notfiy_cq,tag);
+		};
+
+	auto invokerRpc_FindSuccessor = [this](unsigned int Id) {
+		return this->m_pNode->findSuccessor(Id);
+	};
+	// Create a new instance of RpcStateMgmt dedicated for FindSuccessor RPC
+	new RpcStateMgmt<chordMsg::ChordService::AsyncService,chordMsg::Id, 
+	chordMsg::NodeAddr,decltype(initAsyncReq_FindSuccessor),
+	decltype(invokerRpc_FindSuccessor)> 
+	(
+		&service_,
+		cq_.get(),
+		this,
+		initAsyncReq_FindSuccessor,
+		invokerRpc_FindSuccessor
+	);
+
+	// Still to add other RPC handlers
+}
 void GrpcAsyncServer::HandleRpcs() {
-	CallData data{&service_,cq_.get()};
-	new AddCall(&data,this);
-	new SubCall(&data,this);
+	InitiateRpcRequest();
 	void* tag;
 	bool ok;
 	while (true) {
@@ -41,7 +66,7 @@ void GrpcAsyncServer::HandleRpcs() {
 		if(tag == nullptr) {
 			std::cout <<"someting wrong !"<<std::endl;
 		}else {	
-			static_cast<Call*>(tag)->Proceed();
+			static_cast<RpcStateMgmtIntf*>(tag)->Proceed();
 		}
 	}
 }
