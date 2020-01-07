@@ -3,8 +3,9 @@ syntax = "proto3";
 package chordMsg;
 
 service ChordService {
-    rpc FindPredecessor (Empty) returns (NodeAddr) {}
+    rpc getPredecessor (Empty) returns (NodeAddr) {}
     rpc FindSuccessor (Id) returns (NodeAddr) {}
+    rpc getSuccessor (Empty) returns (NodeAddr) {}
     rpc ClosestPrecedingNode (Id) returns (NodeAddr) {}
     rpc Notify (NodeAddr) returns (Empty) {} 
     rpc LookUpKey (Key) returns (KeyValue) {}

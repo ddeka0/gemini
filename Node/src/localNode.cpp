@@ -25,6 +25,7 @@ void LocalNode::join(Address * remote_addr) {
 	if("none:none" != remote_addr->toString()) {
 		// remoteInstance = RemoteNode(RemoteAddress)
 		// self._finger[0] = remoteInstance.findSuccessor(self.getIdentifier())
+		
 	}else {
 		// set the successor to myself, or this node
 		// (*m_table)[0] = this;
@@ -33,18 +34,20 @@ void LocalNode::join(Address * remote_addr) {
 }
 /* Destructor of LocalNode class
 */
-LocalNode::~LocalNode(){
+LocalNode::~LocalNode() {
     // Debug print
     std::cout << "LocalNode instance destroyed" << std::endl;
 };
 
-void LocalNode::initialize(std::shared_ptr<GrpcAsyncServer> _server) {
+void LocalNode::initWithServer(std::shared_ptr<GrpcAsyncServer> _server) {
     std::cout << "LocalNode Initialized"<< std::endl;
     m_server = _server;
-    // m_table = std::shared_ptr<TableBase>(new FingerTable());
-	
 }
 
+void LocalNode::initWithClient(std::shared_ptr<GrpcAsyncClient> _client) {
+    std::cout << "LocalNode Initialized"<< std::endl;
+    m_client = _client;
+}
 /*
 This function assigns address to the node
 */

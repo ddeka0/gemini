@@ -73,8 +73,9 @@ public:
 			case CREATE: {
 				status_ = PROCESS;
 				initAsyncReqfunc_(&ctx_,&request_,&responder_,cq_,cq_,this);
-				// folling line is a test code
-				m_server->getNode()->Get();
+				// // folling line is a test code
+				// // m_server->getNode()->Get();
+				// invokerRpcfunc_(100);
 			}
 			break;
 			case PROCESS: {

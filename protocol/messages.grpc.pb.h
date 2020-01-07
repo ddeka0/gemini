@@ -37,12 +37,12 @@ class ChordService final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    virtual ::grpc::Status FindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> AsyncFindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(AsyncFindPredecessorRaw(context, request, cq));
+    virtual ::grpc::Status getPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> AsyncgetPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(AsyncgetPredecessorRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> PrepareAsyncFindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(PrepareAsyncFindPredecessorRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> PrepareAsyncgetPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(PrepareAsyncgetPredecessorRaw(context, request, cq));
     }
     virtual ::grpc::Status FindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::chordMsg::NodeAddr* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> AsyncFindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
@@ -50,6 +50,13 @@ class ChordService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> PrepareAsyncFindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(PrepareAsyncFindSuccessorRaw(context, request, cq));
+    }
+    virtual ::grpc::Status getSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> AsyncgetSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(AsyncgetSuccessorRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> PrepareAsyncgetSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>>(PrepareAsyncgetSuccessorRaw(context, request, cq));
     }
     virtual ::grpc::Status ClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::chordMsg::NodeAddr* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>> AsyncClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
@@ -89,10 +96,12 @@ class ChordService final {
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
-      virtual void FindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void FindPredecessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void getPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void getPredecessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
       virtual void FindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
       virtual void FindSuccessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void getSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void getSuccessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ClosestPrecedingNode(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) = 0;
       virtual void Notify(::grpc::ClientContext* context, const ::chordMsg::NodeAddr* request, ::chordMsg::Empty* response, std::function<void(::grpc::Status)>) = 0;
@@ -106,10 +115,12 @@ class ChordService final {
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* AsyncFindPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* PrepareAsyncFindPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* AsyncgetPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* PrepareAsyncgetPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* AsyncFindSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* PrepareAsyncFindSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* AsyncgetSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* PrepareAsyncgetSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* AsyncClosestPrecedingNodeRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::NodeAddr>* PrepareAsyncClosestPrecedingNodeRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::chordMsg::Empty>* AsyncNotifyRaw(::grpc::ClientContext* context, const ::chordMsg::NodeAddr& request, ::grpc::CompletionQueue* cq) = 0;
@@ -124,12 +135,12 @@ class ChordService final {
   class Stub final : public StubInterface {
    public:
     Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
-    ::grpc::Status FindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> AsyncFindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(AsyncFindPredecessorRaw(context, request, cq));
+    ::grpc::Status getPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> AsyncgetPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(AsyncgetPredecessorRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> PrepareAsyncFindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(PrepareAsyncFindPredecessorRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> PrepareAsyncgetPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(PrepareAsyncgetPredecessorRaw(context, request, cq));
     }
     ::grpc::Status FindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::chordMsg::NodeAddr* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> AsyncFindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
@@ -137,6 +148,13 @@ class ChordService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> PrepareAsyncFindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(PrepareAsyncFindSuccessorRaw(context, request, cq));
+    }
+    ::grpc::Status getSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::chordMsg::NodeAddr* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> AsyncgetSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(AsyncgetSuccessorRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> PrepareAsyncgetSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>>(PrepareAsyncgetSuccessorRaw(context, request, cq));
     }
     ::grpc::Status ClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::chordMsg::NodeAddr* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>> AsyncClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) {
@@ -176,10 +194,12 @@ class ChordService final {
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
-      void FindPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
-      void FindPredecessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
+      void getPredecessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
+      void getPredecessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
       void FindSuccessor(::grpc::ClientContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
       void FindSuccessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
+      void getSuccessor(::grpc::ClientContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
+      void getSuccessor(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
       void ClosestPrecedingNode(::grpc::ClientContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
       void ClosestPrecedingNode(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::chordMsg::NodeAddr* response, std::function<void(::grpc::Status)>) override;
       void Notify(::grpc::ClientContext* context, const ::chordMsg::NodeAddr* request, ::chordMsg::Empty* response, std::function<void(::grpc::Status)>) override;
@@ -201,10 +221,12 @@ class ChordService final {
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     class experimental_async async_stub_{this};
-    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* AsyncFindPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* PrepareAsyncFindPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* AsyncgetPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* PrepareAsyncgetPredecessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* AsyncFindSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* PrepareAsyncFindSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* AsyncgetSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* PrepareAsyncgetSuccessorRaw(::grpc::ClientContext* context, const ::chordMsg::Empty& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* AsyncClosestPrecedingNodeRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::NodeAddr>* PrepareAsyncClosestPrecedingNodeRaw(::grpc::ClientContext* context, const ::chordMsg::Id& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::Empty>* AsyncNotifyRaw(::grpc::ClientContext* context, const ::chordMsg::NodeAddr& request, ::grpc::CompletionQueue* cq) override;
@@ -215,8 +237,9 @@ class ChordService final {
     ::grpc::ClientAsyncResponseReader< ::chordMsg::KeyValue>* PrepareAsyncFinalLookUpKeyRaw(::grpc::ClientContext* context, const ::chordMsg::Key& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::Empty>* AsyncInsertKeyValueRaw(::grpc::ClientContext* context, const ::chordMsg::KeyValue& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::chordMsg::Empty>* PrepareAsyncInsertKeyValueRaw(::grpc::ClientContext* context, const ::chordMsg::KeyValue& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::internal::RpcMethod rpcmethod_FindPredecessor_;
+    const ::grpc::internal::RpcMethod rpcmethod_getPredecessor_;
     const ::grpc::internal::RpcMethod rpcmethod_FindSuccessor_;
+    const ::grpc::internal::RpcMethod rpcmethod_getSuccessor_;
     const ::grpc::internal::RpcMethod rpcmethod_ClosestPrecedingNode_;
     const ::grpc::internal::RpcMethod rpcmethod_Notify_;
     const ::grpc::internal::RpcMethod rpcmethod_LookUpKey_;
@@ -229,8 +252,9 @@ class ChordService final {
    public:
     Service();
     virtual ~Service();
-    virtual ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response);
+    virtual ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response);
     virtual ::grpc::Status FindSuccessor(::grpc::ServerContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response);
+    virtual ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response);
     virtual ::grpc::Status ClosestPrecedingNode(::grpc::ServerContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response);
     virtual ::grpc::Status Notify(::grpc::ServerContext* context, const ::chordMsg::NodeAddr* request, ::chordMsg::Empty* response);
     virtual ::grpc::Status LookUpKey(::grpc::ServerContext* context, const ::chordMsg::Key* request, ::chordMsg::KeyValue* response);
@@ -238,22 +262,22 @@ class ChordService final {
     virtual ::grpc::Status InsertKeyValue(::grpc::ServerContext* context, const ::chordMsg::KeyValue* request, ::chordMsg::Empty* response);
   };
   template <class BaseClass>
-  class WithAsyncMethod_FindPredecessor : public BaseClass {
+  class WithAsyncMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_FindPredecessor() {
+    WithAsyncMethod_getPredecessor() {
       ::grpc::Service::MarkMethodAsync(0);
     }
-    ~WithAsyncMethod_FindPredecessor() override {
+    ~WithAsyncMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestFindPredecessor(::grpc::ServerContext* context, ::chordMsg::Empty* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::NodeAddr>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestgetPredecessor(::grpc::ServerContext* context, ::chordMsg::Empty* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::NodeAddr>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -278,12 +302,32 @@ class ChordService final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_getSuccessor() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestgetSuccessor(::grpc::ServerContext* context, ::chordMsg::Empty* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::NodeAddr>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ClosestPrecedingNode() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(3);
     }
     ~WithAsyncMethod_ClosestPrecedingNode() override {
       BaseClassMustBeDerivedFromService(this);
@@ -294,7 +338,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestClosestPrecedingNode(::grpc::ServerContext* context, ::chordMsg::Id* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::NodeAddr>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -303,7 +347,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_Notify() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(4);
     }
     ~WithAsyncMethod_Notify() override {
       BaseClassMustBeDerivedFromService(this);
@@ -314,7 +358,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestNotify(::grpc::ServerContext* context, ::chordMsg::NodeAddr* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -323,7 +367,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_LookUpKey() {
-      ::grpc::Service::MarkMethodAsync(4);
+      ::grpc::Service::MarkMethodAsync(5);
     }
     ~WithAsyncMethod_LookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -334,7 +378,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestLookUpKey(::grpc::ServerContext* context, ::chordMsg::Key* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::KeyValue>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -343,7 +387,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_FinalLookUpKey() {
-      ::grpc::Service::MarkMethodAsync(5);
+      ::grpc::Service::MarkMethodAsync(6);
     }
     ~WithAsyncMethod_FinalLookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -354,7 +398,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestFinalLookUpKey(::grpc::ServerContext* context, ::chordMsg::Key* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::KeyValue>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -363,7 +407,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_InsertKeyValue() {
-      ::grpc::Service::MarkMethodAsync(6);
+      ::grpc::Service::MarkMethodAsync(7);
     }
     ~WithAsyncMethod_InsertKeyValue() override {
       BaseClassMustBeDerivedFromService(this);
@@ -374,34 +418,34 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestInsertKeyValue(::grpc::ServerContext* context, ::chordMsg::KeyValue* request, ::grpc::ServerAsyncResponseWriter< ::chordMsg::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_FindPredecessor<WithAsyncMethod_FindSuccessor<WithAsyncMethod_ClosestPrecedingNode<WithAsyncMethod_Notify<WithAsyncMethod_LookUpKey<WithAsyncMethod_FinalLookUpKey<WithAsyncMethod_InsertKeyValue<Service > > > > > > > AsyncService;
+  typedef WithAsyncMethod_getPredecessor<WithAsyncMethod_FindSuccessor<WithAsyncMethod_getSuccessor<WithAsyncMethod_ClosestPrecedingNode<WithAsyncMethod_Notify<WithAsyncMethod_LookUpKey<WithAsyncMethod_FinalLookUpKey<WithAsyncMethod_InsertKeyValue<Service > > > > > > > > AsyncService;
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_FindPredecessor : public BaseClass {
+  class ExperimentalWithCallbackMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithCallbackMethod_FindPredecessor() {
+    ExperimentalWithCallbackMethod_getPredecessor() {
       ::grpc::Service::experimental().MarkMethodCallback(0,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::Empty, ::chordMsg::NodeAddr>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::Empty* request,
                  ::chordMsg::NodeAddr* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->FindPredecessor(context, request, response, controller);
+                   return this->getPredecessor(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithCallbackMethod_FindPredecessor() override {
+    ~ExperimentalWithCallbackMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_FindSuccessor : public BaseClass {
@@ -429,12 +473,37 @@ class ChordService final {
     virtual void FindSuccessor(::grpc::ServerContext* context, const ::chordMsg::Id* request, ::chordMsg::NodeAddr* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithCallbackMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_getSuccessor() {
+      ::grpc::Service::experimental().MarkMethodCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::Empty, ::chordMsg::NodeAddr>(
+          [this](::grpc::ServerContext* context,
+                 const ::chordMsg::Empty* request,
+                 ::chordMsg::NodeAddr* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->getSuccessor(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithCallbackMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithCallbackMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ClosestPrecedingNode() {
-      ::grpc::Service::experimental().MarkMethodCallback(2,
+      ::grpc::Service::experimental().MarkMethodCallback(3,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::Id, ::chordMsg::NodeAddr>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::Id* request,
@@ -459,7 +528,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_Notify() {
-      ::grpc::Service::experimental().MarkMethodCallback(3,
+      ::grpc::Service::experimental().MarkMethodCallback(4,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::NodeAddr, ::chordMsg::Empty>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::NodeAddr* request,
@@ -484,7 +553,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_LookUpKey() {
-      ::grpc::Service::experimental().MarkMethodCallback(4,
+      ::grpc::Service::experimental().MarkMethodCallback(5,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::Key, ::chordMsg::KeyValue>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::Key* request,
@@ -509,7 +578,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_FinalLookUpKey() {
-      ::grpc::Service::experimental().MarkMethodCallback(5,
+      ::grpc::Service::experimental().MarkMethodCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::Key, ::chordMsg::KeyValue>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::Key* request,
@@ -534,7 +603,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_InsertKeyValue() {
-      ::grpc::Service::experimental().MarkMethodCallback(6,
+      ::grpc::Service::experimental().MarkMethodCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::chordMsg::KeyValue, ::chordMsg::Empty>(
           [this](::grpc::ServerContext* context,
                  const ::chordMsg::KeyValue* request,
@@ -553,20 +622,20 @@ class ChordService final {
     }
     virtual void InsertKeyValue(::grpc::ServerContext* context, const ::chordMsg::KeyValue* request, ::chordMsg::Empty* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_FindPredecessor<ExperimentalWithCallbackMethod_FindSuccessor<ExperimentalWithCallbackMethod_ClosestPrecedingNode<ExperimentalWithCallbackMethod_Notify<ExperimentalWithCallbackMethod_LookUpKey<ExperimentalWithCallbackMethod_FinalLookUpKey<ExperimentalWithCallbackMethod_InsertKeyValue<Service > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_getPredecessor<ExperimentalWithCallbackMethod_FindSuccessor<ExperimentalWithCallbackMethod_getSuccessor<ExperimentalWithCallbackMethod_ClosestPrecedingNode<ExperimentalWithCallbackMethod_Notify<ExperimentalWithCallbackMethod_LookUpKey<ExperimentalWithCallbackMethod_FinalLookUpKey<ExperimentalWithCallbackMethod_InsertKeyValue<Service > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
-  class WithGenericMethod_FindPredecessor : public BaseClass {
+  class WithGenericMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_FindPredecessor() {
+    WithGenericMethod_getPredecessor() {
       ::grpc::Service::MarkMethodGeneric(0);
     }
-    ~WithGenericMethod_FindPredecessor() override {
+    ~WithGenericMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -589,12 +658,29 @@ class ChordService final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_getSuccessor() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ClosestPrecedingNode() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(3);
     }
     ~WithGenericMethod_ClosestPrecedingNode() override {
       BaseClassMustBeDerivedFromService(this);
@@ -611,7 +697,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_Notify() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(4);
     }
     ~WithGenericMethod_Notify() override {
       BaseClassMustBeDerivedFromService(this);
@@ -628,7 +714,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_LookUpKey() {
-      ::grpc::Service::MarkMethodGeneric(4);
+      ::grpc::Service::MarkMethodGeneric(5);
     }
     ~WithGenericMethod_LookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -645,7 +731,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_FinalLookUpKey() {
-      ::grpc::Service::MarkMethodGeneric(5);
+      ::grpc::Service::MarkMethodGeneric(6);
     }
     ~WithGenericMethod_FinalLookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -662,7 +748,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_InsertKeyValue() {
-      ::grpc::Service::MarkMethodGeneric(6);
+      ::grpc::Service::MarkMethodGeneric(7);
     }
     ~WithGenericMethod_InsertKeyValue() override {
       BaseClassMustBeDerivedFromService(this);
@@ -674,22 +760,22 @@ class ChordService final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_FindPredecessor : public BaseClass {
+  class WithRawMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithRawMethod_FindPredecessor() {
+    WithRawMethod_getPredecessor() {
       ::grpc::Service::MarkMethodRaw(0);
     }
-    ~WithRawMethod_FindPredecessor() override {
+    ~WithRawMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestFindPredecessor(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestgetPredecessor(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -714,12 +800,32 @@ class ChordService final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_getSuccessor() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestgetSuccessor(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ClosestPrecedingNode() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(3);
     }
     ~WithRawMethod_ClosestPrecedingNode() override {
       BaseClassMustBeDerivedFromService(this);
@@ -730,7 +836,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestClosestPrecedingNode(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -739,7 +845,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_Notify() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(4);
     }
     ~WithRawMethod_Notify() override {
       BaseClassMustBeDerivedFromService(this);
@@ -750,7 +856,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestNotify(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -759,7 +865,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_LookUpKey() {
-      ::grpc::Service::MarkMethodRaw(4);
+      ::grpc::Service::MarkMethodRaw(5);
     }
     ~WithRawMethod_LookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -770,7 +876,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestLookUpKey(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -779,7 +885,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_FinalLookUpKey() {
-      ::grpc::Service::MarkMethodRaw(5);
+      ::grpc::Service::MarkMethodRaw(6);
     }
     ~WithRawMethod_FinalLookUpKey() override {
       BaseClassMustBeDerivedFromService(this);
@@ -790,7 +896,7 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestFinalLookUpKey(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -799,7 +905,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_InsertKeyValue() {
-      ::grpc::Service::MarkMethodRaw(6);
+      ::grpc::Service::MarkMethodRaw(7);
     }
     ~WithRawMethod_InsertKeyValue() override {
       BaseClassMustBeDerivedFromService(this);
@@ -810,33 +916,33 @@ class ChordService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestInsertKeyValue(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_FindPredecessor : public BaseClass {
+  class ExperimentalWithRawCallbackMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithRawCallbackMethod_FindPredecessor() {
+    ExperimentalWithRawCallbackMethod_getPredecessor() {
       ::grpc::Service::experimental().MarkMethodRawCallback(0,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
                  ::grpc::ByteBuffer* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->FindPredecessor(context, request, response, controller);
+                   this->getPredecessor(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithRawCallbackMethod_FindPredecessor() override {
+    ~ExperimentalWithRawCallbackMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void FindPredecessor(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void getPredecessor(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_FindSuccessor : public BaseClass {
@@ -864,12 +970,37 @@ class ChordService final {
     virtual void FindSuccessor(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_getSuccessor() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->getSuccessor(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void getSuccessor(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ClosestPrecedingNode() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(2,
+      ::grpc::Service::experimental().MarkMethodRawCallback(3,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -894,7 +1025,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_Notify() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(3,
+      ::grpc::Service::experimental().MarkMethodRawCallback(4,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -919,7 +1050,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_LookUpKey() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(4,
+      ::grpc::Service::experimental().MarkMethodRawCallback(5,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -944,7 +1075,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_FinalLookUpKey() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(5,
+      ::grpc::Service::experimental().MarkMethodRawCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -969,7 +1100,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_InsertKeyValue() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(6,
+      ::grpc::Service::experimental().MarkMethodRawCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -989,24 +1120,24 @@ class ChordService final {
     virtual void InsertKeyValue(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_FindPredecessor : public BaseClass {
+  class WithStreamedUnaryMethod_getPredecessor : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithStreamedUnaryMethod_FindPredecessor() {
+    WithStreamedUnaryMethod_getPredecessor() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Empty, ::chordMsg::NodeAddr>(std::bind(&WithStreamedUnaryMethod_FindPredecessor<BaseClass>::StreamedFindPredecessor, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Empty, ::chordMsg::NodeAddr>(std::bind(&WithStreamedUnaryMethod_getPredecessor<BaseClass>::StreamedgetPredecessor, this, std::placeholders::_1, std::placeholders::_2)));
     }
-    ~WithStreamedUnaryMethod_FindPredecessor() override {
+    ~WithStreamedUnaryMethod_getPredecessor() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status FindPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+    ::grpc::Status getPredecessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedFindPredecessor(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::chordMsg::Empty,::chordMsg::NodeAddr>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedgetPredecessor(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::chordMsg::Empty,::chordMsg::NodeAddr>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_FindSuccessor : public BaseClass {
@@ -1029,12 +1160,32 @@ class ChordService final {
     virtual ::grpc::Status StreamedFindSuccessor(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::chordMsg::Id,::chordMsg::NodeAddr>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_getSuccessor : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_getSuccessor() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Empty, ::chordMsg::NodeAddr>(std::bind(&WithStreamedUnaryMethod_getSuccessor<BaseClass>::StreamedgetSuccessor, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_getSuccessor() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status getSuccessor(::grpc::ServerContext* context, const ::chordMsg::Empty* request, ::chordMsg::NodeAddr* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedgetSuccessor(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::chordMsg::Empty,::chordMsg::NodeAddr>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_ClosestPrecedingNode : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ClosestPrecedingNode() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(3,
         new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Id, ::chordMsg::NodeAddr>(std::bind(&WithStreamedUnaryMethod_ClosestPrecedingNode<BaseClass>::StreamedClosestPrecedingNode, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ClosestPrecedingNode() override {
@@ -1054,7 +1205,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_Notify() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(4,
         new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::NodeAddr, ::chordMsg::Empty>(std::bind(&WithStreamedUnaryMethod_Notify<BaseClass>::StreamedNotify, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Notify() override {
@@ -1074,7 +1225,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_LookUpKey() {
-      ::grpc::Service::MarkMethodStreamed(4,
+      ::grpc::Service::MarkMethodStreamed(5,
         new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Key, ::chordMsg::KeyValue>(std::bind(&WithStreamedUnaryMethod_LookUpKey<BaseClass>::StreamedLookUpKey, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_LookUpKey() override {
@@ -1094,7 +1245,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_FinalLookUpKey() {
-      ::grpc::Service::MarkMethodStreamed(5,
+      ::grpc::Service::MarkMethodStreamed(6,
         new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::Key, ::chordMsg::KeyValue>(std::bind(&WithStreamedUnaryMethod_FinalLookUpKey<BaseClass>::StreamedFinalLookUpKey, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_FinalLookUpKey() override {
@@ -1114,7 +1265,7 @@ class ChordService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_InsertKeyValue() {
-      ::grpc::Service::MarkMethodStreamed(6,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler< ::chordMsg::KeyValue, ::chordMsg::Empty>(std::bind(&WithStreamedUnaryMethod_InsertKeyValue<BaseClass>::StreamedInsertKeyValue, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_InsertKeyValue() override {
@@ -1128,9 +1279,9 @@ class ChordService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedInsertKeyValue(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::chordMsg::KeyValue,::chordMsg::Empty>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_FindPredecessor<WithStreamedUnaryMethod_FindSuccessor<WithStreamedUnaryMethod_ClosestPrecedingNode<WithStreamedUnaryMethod_Notify<WithStreamedUnaryMethod_LookUpKey<WithStreamedUnaryMethod_FinalLookUpKey<WithStreamedUnaryMethod_InsertKeyValue<Service > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_getPredecessor<WithStreamedUnaryMethod_FindSuccessor<WithStreamedUnaryMethod_getSuccessor<WithStreamedUnaryMethod_ClosestPrecedingNode<WithStreamedUnaryMethod_Notify<WithStreamedUnaryMethod_LookUpKey<WithStreamedUnaryMethod_FinalLookUpKey<WithStreamedUnaryMethod_InsertKeyValue<Service > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_FindPredecessor<WithStreamedUnaryMethod_FindSuccessor<WithStreamedUnaryMethod_ClosestPrecedingNode<WithStreamedUnaryMethod_Notify<WithStreamedUnaryMethod_LookUpKey<WithStreamedUnaryMethod_FinalLookUpKey<WithStreamedUnaryMethod_InsertKeyValue<Service > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_getPredecessor<WithStreamedUnaryMethod_FindSuccessor<WithStreamedUnaryMethod_getSuccessor<WithStreamedUnaryMethod_ClosestPrecedingNode<WithStreamedUnaryMethod_Notify<WithStreamedUnaryMethod_LookUpKey<WithStreamedUnaryMethod_FinalLookUpKey<WithStreamedUnaryMethod_InsertKeyValue<Service > > > > > > > > StreamedService;
 };
 
 }  // namespace chordMsg

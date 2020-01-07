@@ -1,6 +1,7 @@
 #pragma once
 #include "Chord/include/common.hpp"
 #include "Chord/include/address.hpp"
+#include "ClientUtils/include/grpcAsyncClient.hpp"
 // #include "Chord/include/tableBase.hpp"
 
 class GrpcAsyncServer;
@@ -10,7 +11,10 @@ class NodeBase {
 public:
 	NodeBase();
 	~NodeBase();
-	virtual void initialize(std::shared_ptr<GrpcAsyncServer>) = 0; // pure vf
+	
+	virtual void initWithServer(std::shared_ptr<GrpcAsyncServer>);
+	virtual void initWithClient(std::shared_ptr<GrpcAsyncClient>);
+
 	virtual std::shared_ptr<Address> getAddress() = 0;
 	
 	/*
