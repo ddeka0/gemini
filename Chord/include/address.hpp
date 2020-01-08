@@ -11,6 +11,8 @@ public:
     Address(std::string &&ipAddr,std::string &&port);
     // Address(std::string &&port,std::string ipAddr = "localhost");
     std::string toString();
+    std::string getIpAddr();
+    std::string getPort();
 protected:
 private:
     std::string m_ipv4Addr;

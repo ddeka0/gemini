@@ -89,7 +89,8 @@ public:
 				// int a = request_.a();
 				// int b = request_.b();
 				// response_.set_result(a+b);
-				invokerRpcfunc_(0); // 0 is wrong as of now
+				
+				response_ =  invokerRpcfunc_(request_);
 
 
 				status_ = FINISH;

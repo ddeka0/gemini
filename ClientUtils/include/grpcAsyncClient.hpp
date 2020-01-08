@@ -14,16 +14,18 @@ using grpc::ClientContext;
 using grpc::CompletionQueue;
 using grpc::Status;
 
+using ClientStub = chordMsg::ChordService::Stub;
+
 class GrpcAsyncClient {
 public:
-    explicit GrpcAsyncClient(std::shared_ptr<Channel> channel);
+    explicit GrpcAsyncClient(NodeBase*);
     virtual ~GrpcAsyncClient();
     NodeBase* getPredecessor();
+    NodeBase* findSuccessor(unsigned int Id);
+    static ClientStub* setupNewChannel();
     
+protected:
 private:
-	
-	std::unique_ptr<chordMsg::ChordService::Stub> stub_;
-}
-
-
-
+    NodeBase* m_node;
+    
+};

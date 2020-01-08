@@ -39,13 +39,19 @@ void GrpcAsyncServer::InitiateRpcRequest() {
 			this->service_.RequestFindSuccessor(ctx,request,responder,call_cq,notfiy_cq,tag);
 		};
 
-	auto invokerRpc_FindSuccessor = [this](unsigned int Id) {
-		return this->m_pNode->findSuccessor(Id);
+	auto invokerRpc_FindSuccessor = [this](chordMsg::Id request) {
+		std::cout <<"RPC request came from remote node" << std::endl;
+		
+		NodeBase* node = this->m_pNode->findSuccessor(request.id());
+		chordMsg::NodeAddr resp;
+		resp.set_ip_addr(node->getAddress()->getIpAddr());
+		resp.set_port(node->getAddress()->getPort());
+		return resp;
 	};
 	// Create a new instance of RpcStateMgmt dedicated for FindSuccessor RPC
 	new RpcStateMgmt<chordMsg::ChordService::AsyncService,chordMsg::Id, 
 	chordMsg::NodeAddr,decltype(initAsyncReq_FindSuccessor),
-	decltype(invokerRpc_FindSuccessor)> 
+	decltype(invokerRpc_FindSuccessor)>
 	(
 		&service_,
 		cq_.get(),

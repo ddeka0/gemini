@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
     std::shared_ptr<GrpcAsyncServer> server = std::shared_ptr<GrpcAsyncServer>(
         new GrpcAsyncServer(node.get())
     );
+
+
     
     node->addServices(GET_SERVICE_FLAG);
 
@@ -28,7 +30,13 @@ int main(int argc, char* argv[]) {
     node->join(remote_addr.get()); // just passing a normal pointer
 
     // set the server
-    node->initialize(server);
+    node->initWithServer(server);
+    
+    std::shared_ptr<GrpcAsyncClient> client = std::shared_ptr<GrpcAsyncClient>(
+        new GrpcAsyncClient(node.get())
+    );    
+    
+    node->initWithClient(client);
 
     std::thread t1(&LocalNode::stabilize,node);
     std::thread t2(&LocalNode::fixFingers,node);

@@ -1,10 +1,10 @@
 #pragma once
 #include "Chord/include/common.hpp"
 #include "Chord/include/address.hpp"
-#include "ClientUtils/include/grpcAsyncClient.hpp"
 // #include "Chord/include/tableBase.hpp"
 
 class GrpcAsyncServer;
+class GrpcAsyncClient;
 class TableBase;
 
 class NodeBase {

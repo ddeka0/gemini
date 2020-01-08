@@ -1,4 +1,5 @@
 #include "localNode.hpp"
+#include "remoteNode.hpp"
 #include "Chord/include/utils.hpp" // for hashing
 
 /* Constructor of LocalNode class
@@ -25,6 +26,9 @@ void LocalNode::join(Address * remote_addr) {
 	if("none:none" != remote_addr->toString()) {
 		// remoteInstance = RemoteNode(RemoteAddress)
 		// self._finger[0] = remoteInstance.findSuccessor(self.getIdentifier())
+		RemoteNode remoteInstance;
+		auto rnode = remoteInstance.findSuccessor(this->getId());
+		m_table->setEntry(0,rnode);
 		
 	}else {
 		// set the successor to myself, or this node
@@ -137,7 +141,7 @@ void LocalNode::fixFingers() {
 		m_table->setEntry(nxt - 1,this->findSuccessor(this->getId(1<<(nxt - 1))));
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		m_table->printTable();
+		// m_table->printTable();
 		//this->printTable();
 	}
 }
@@ -211,7 +215,9 @@ void LocalNode::notify(NodeBase * remote) {
     {
 
         this->m_predecessor = remote;
-    }
+    }else {
+		std::cout <<"Somewhere else" << std::endl;
+	}
     // some TODO task for key transfer from this node the new predecessor
 }
 

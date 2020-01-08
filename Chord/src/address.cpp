@@ -26,3 +26,11 @@ Address::Address(std::string &&ipAddr,std::string &&port)
 std::string Address::toString() {
     return std::string(m_ipv4Addr + ":" + m_port);
 }
+
+std::string Address::getIpAddr() {
+    return m_ipv4Addr;
+}
+
+std::string Address::getPort() {
+    return m_port;
+}

@@ -3,8 +3,9 @@
 
 /* Constructor of LocalNode class
 */
-RemoteNode::RemoteNode() {}
-RemoteNode::~RemoteNode() {}
+RemoteNode::RemoteNode() {
+    std::cout << "RemoteNode instance created" << std::endl;
+}
 
 void RemoteNode::join(Address * remote_addr) {
     std::cout <<"RemoteNode join(), Invalid call" << std::endl;
@@ -50,6 +51,7 @@ void RemoteNode::Get() {
 
 NodeBase* RemoteNode::getPredecessor() {
     // TODO Setup RPC call
+
     return m_client->getPredecessor();
 }
 
@@ -73,6 +75,7 @@ unsigned int RemoteNode::getId(unsigned int x) {
 
 NodeBase* RemoteNode::findSuccessor(unsigned int Id) {
     // TODO setup RPC call
+    return m_client->findSuccessor(Id);
 }
 
 void RemoteNode::fixFingers() {

@@ -17,6 +17,7 @@ add_subdirectory(AuthSecurity bin_auth)
 add_subdirectory(Node bin_node)
 add_subdirectory(Services bin_services)
 add_subdirectory(ServerUtils bin_serverUtils)
+add_subdirectory(ClientUtils bin_clientUtils)
 
 # add all include paths
 include_directories(${PROJECT_SOURCE_DIR})
@@ -65,9 +66,13 @@ if(grpc_location2)
   message(STATUS "grpc found at " ${grpc_location2})
 endif()
 
-target_link_libraries(${PROJECT_NAME} libNODE libSERVICES
+target_link_libraries(${PROJECT_NAME}  
+                        libNODE
+                        libSERVICES
                         libAUTH 
                         libSERVER
+                        libCLIENT
+                        libNODE # dont remove two times !!!
                         ${proto_location}
                         ${LIB_FILE}
                         ${grpc_location}
