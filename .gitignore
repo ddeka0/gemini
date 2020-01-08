@@ -46,5 +46,6 @@ bin_logsys/
 bin_serverutils/
 bin_sysmonitor/
 bin_serverUtils/
+bin_clientUtils/
 
 protocol/libmylib.a
