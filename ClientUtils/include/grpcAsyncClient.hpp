@@ -22,6 +22,7 @@ public:
     virtual ~GrpcAsyncClient();
     NodeBase* getPredecessor();
     NodeBase* findSuccessor(unsigned int Id);
+    void notify(NodeBase* remote);
     static ClientStub* setupNewChannel();
     
 protected:

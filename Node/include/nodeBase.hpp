@@ -10,7 +10,7 @@ class TableBase;
 class NodeBase {
 public:
 	NodeBase();
-	~NodeBase();
+	virtual ~NodeBase();
 	
 	virtual void initWithServer(std::shared_ptr<GrpcAsyncServer>);
 	virtual void initWithClient(std::shared_ptr<GrpcAsyncClient>);
@@ -67,6 +67,7 @@ public:
 										// therefore we want a single instance
 										// of it 
 	NodeBase * m_predecessor = nullptr;
+	// std::shared_ptr<NodeBase> m_predecessor = nullptr;
 protected:
 	std::shared_ptr<Address> m_addr;
 private:

@@ -4,7 +4,7 @@
 /* Constructor of LocalNode class
 */
 RemoteNode::RemoteNode() {
-    std::cout << "RemoteNode instance created" << std::endl;
+    std::cout << this <<" RemoteNode instance created" << std::endl;
 }
 
 void RemoteNode::join(Address * remote_addr) {
@@ -14,7 +14,7 @@ void RemoteNode::join(Address * remote_addr) {
 */
 RemoteNode::~RemoteNode() {
     // Debug print
-    std::cout << "RemoteNode instance destroyed" << std::endl;
+    std::cout << this <<" RemoteNode instance destroyed" << std::endl;
 };
 
 void RemoteNode::initWithClient(std::shared_ptr<GrpcAsyncClient> _client) {
@@ -50,7 +50,6 @@ void RemoteNode::Get() {
 }
 
 NodeBase* RemoteNode::getPredecessor() {
-    // TODO Setup RPC call
 
     return m_client->getPredecessor();
 }
@@ -75,6 +74,7 @@ unsigned int RemoteNode::getId(unsigned int x) {
 
 NodeBase* RemoteNode::findSuccessor(unsigned int Id) {
     // TODO setup RPC call
+    std::cout <<"mclient = " << m_client << std::endl;
     return m_client->findSuccessor(Id);
 }
 
@@ -94,6 +94,7 @@ void RemoteNode::stabilize() {
 
 void RemoteNode::notify(NodeBase * remote) {
     // TODO setup RPC call
+    m_client->notify(remote);
 }
 
 void RemoteNode::checkPredecessor() {

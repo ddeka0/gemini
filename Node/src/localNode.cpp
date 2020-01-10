@@ -27,6 +27,13 @@ void LocalNode::join(Address * remote_addr) {
 		// remoteInstance = RemoteNode(RemoteAddress)
 		// self._finger[0] = remoteInstance.findSuccessor(self.getIdentifier())
 		RemoteNode remoteInstance;
+		remoteInstance.setAddress(std::shared_ptr<Address>(remote_addr));
+		std::shared_ptr<GrpcAsyncClient> client = std::shared_ptr<GrpcAsyncClient>(
+			new GrpcAsyncClient(&remoteInstance)
+		);  
+
+		remoteInstance.initWithClient(client);
+
 		auto rnode = remoteInstance.findSuccessor(this->getId());
 		m_table->setEntry(0,rnode);
 		
@@ -141,7 +148,7 @@ void LocalNode::fixFingers() {
 		m_table->setEntry(nxt - 1,this->findSuccessor(this->getId(1<<(nxt - 1))));
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		// m_table->printTable();
+		m_table->printTable();
 		//this->printTable();
 	}
 }
@@ -168,7 +175,13 @@ void LocalNode::stabilize() {
 	while(true) {
 		std::string lg("");
 		if(nullptr != this->getPredecessor()) {
-			lg += "Predecessor = " + getPredecessor()->getAddress()->toString(); 
+			if(nullptr != getPredecessor()->getAddress())
+				lg += "Predecessor = " + getPredecessor()->getAddress()->toString();
+			else
+			{
+				std::cout<<"0000000000000000000000000000000000"<<std::endl;
+			}
+			
 		}
 		if(nullptr != this->getSuccessor()) {
 			lg += " | Successor = " + getSuccessor()->getAddress()->toString();
@@ -196,6 +209,9 @@ void LocalNode::stabilize() {
 				(pred->getId() != suc->getId()))
 			{
 				this->setSuccessor(pred);
+			}else {
+				if(pred != this)
+					delete pred;
 			}
 		}
 		this->getSuccessor()->notify(this);
@@ -206,15 +222,23 @@ void LocalNode::stabilize() {
 
 
 void LocalNode::notify(NodeBase * remote) {
-    PRINT_FUNC_NAME;
+    
     if( (this->getPredecessor() == nullptr or this->getPredecessor() == this) or
     ( (inrange(remote->getId(),this->getPredecessor()->getId(),this->getId())) and
     (this->getPredecessor()->getId() != this->getId()) and
     (remote->getId() != this->getSuccessor()->getId()) and
     (remote->getId() != this->getId()) ) )
     {
+		if(remote->getId() != this->getId()) {
+			std::cout << "Predecessor is changed" << std::endl;
+		}
+        // this->m_predecessor = remote;
+		if(this->m_predecessor != nullptr and this->m_predecessor != this) {
+			delete this->m_predecessor;
+			this->m_predecessor = nullptr;
+		}
+		this->m_predecessor = remote;
 
-        this->m_predecessor = remote;
     }else {
 		std::cout <<"Somewhere else" << std::endl;
 	}

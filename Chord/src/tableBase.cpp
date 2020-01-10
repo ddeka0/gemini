@@ -9,6 +9,12 @@ NodeBase*& TableBase::operator[](int idx) {
 }
 
 void TableBase::setEntry(int idx,NodeBase* node) {
+    // if(Map.find(idx) != Map.end()) {
+    //     if(Map[idx] != nullptr) {
+    //         delete Map[idx];
+    //         Map[idx] = nullptr;
+    //     }
+    // }
     Map[idx] = node;
 }
 
