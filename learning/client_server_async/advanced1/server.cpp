@@ -22,7 +22,7 @@ using namespace std::chrono;
 #include <grpc/support/log.h>
 
 
-#include "math.grpc.pb.h"
+#include "proto_lib/math.grpc.pb.h"
 
 
 using grpc::Server;

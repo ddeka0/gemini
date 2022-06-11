@@ -1,6 +1,6 @@
 # cmake build files
 /cmake/build
-
+geminiWorkSpace
 # Visual Studio Code artifacts
 .vscode/*
 .history/
@@ -33,7 +33,7 @@ tags
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
+./Makefile
 
 build/
 bin/
@@ -45,3 +45,7 @@ bin_database/
 bin_logsys/
 bin_serverutils/
 bin_sysmonitor/
+bin_serverUtils/
+bin_clientUtils/
+
+protocol/libmylib.a

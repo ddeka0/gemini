@@ -3,7 +3,9 @@
 class GetService : public ServiceBase {
 public:
 	GetService();
-	~GetService();
+	virtual ~GetService();
+
+	void Get() override;
 protected:
 private:
 };

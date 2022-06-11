@@ -54,3 +54,16 @@
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
+
+#include <cstdint>
+
+
+#define GET_SERVICE_FLAG    1<<1
+#define PUT_SERVICE_FLAG    1<<2    
+
+#define NBITS 10
+#define SIZE  1<<NBITS
+
+// #define PRINT_FUNC_NAME     std::cout << __FILE__ <<":"<<__LINE__ <<" "<< __func__ << std::endl
+#define PRINT_FUNC_NAME 0
+bool inrange(unsigned int a,unsigned int b,unsigned int c);

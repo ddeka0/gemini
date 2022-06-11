@@ -14,9 +14,13 @@ public:
 	~ServiceManager();
 	void initialize();
 	void addService(e_ServiceType service);
+	void addService(uint8_t flag);
 	void delService(e_ServiceType service);
 	void updateService();
+
+	void executeHandler();
+	
 protected:
 private:
-	std::vector<ServiceBase*> serviceList;
+	std::vector<std::shared_ptr<ServiceBase>> m_serviceList;
 };

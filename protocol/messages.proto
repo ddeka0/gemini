@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package chordMsg;
+
+service ChordService {
+    rpc getPredecessor (Empty) returns (NodeAddr) {}
+    rpc FindSuccessor (Id) returns (NodeAddr) {}
+    rpc getSuccessor (Empty) returns (NodeAddr) {}
+    rpc ClosestPrecedingNode (Id) returns (NodeAddr) {}
+    rpc Notify (NodeAddr) returns (Empty) {} 
+    rpc LookUpKey (Key) returns (KeyValue) {}
+    rpc FinalLookUpKey (Key) returns (KeyValue) {}
+    rpc InsertKeyValue (KeyValue) returns (Empty) {}
+}
+
+message Empty {
+
+}
+
+message NodeAddr {
+    string ip_addr = 1;
+    string port = 2;
+}
+
+message Id {
+    int32 id = 1;
+}
+
+message Key {
+    string key = 1;
+}
+
+message KeyValue {
+    string key = 1;
+    string value = 2;
+}

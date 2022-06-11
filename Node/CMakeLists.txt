@@ -7,5 +7,5 @@ file(GLOB NODE_SRC src/*.cpp)
 
 add_library(libNODE STATIC ${NODE_SRC})
 
-set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -g")
+set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -g -lcrypto")
 # set(CRYPTO_LIBRARIES  "-lssl -lcrypto")

@@ -3,8 +3,9 @@
 #include "tableBase.hpp"
 class FingerTable : public TableBase {
 public:
-    FingerTable(){};
-    ~FingerTable(){};
+    FingerTable();
+    ~FingerTable();
+    void printTable() override;
 protected:
 private:
 };
